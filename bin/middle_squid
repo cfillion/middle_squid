@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require 'middle_squid'
+
+config_file = 'config.rb'
+
+ms = MiddleSquid.new
+ms.eval config_file
