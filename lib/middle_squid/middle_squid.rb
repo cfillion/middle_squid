@@ -20,6 +20,10 @@ class MiddleSquid
     instance_eval content, file
   end
 
+  def config
+    yield Config
+  end
+
   def run(callback)
     @user_callback = callback
 
@@ -58,7 +62,7 @@ class MiddleSquid
   # @see http://wiki.squid-cache.org/Features/Redirectors
   def squid_handler(line)
     chan_id, url, *extras = line.split
-    @user_callback.call URI(url), extras
+    @user_callback.call URI.parse(url), extras
     accept
   rescue Action => action
     case action.type

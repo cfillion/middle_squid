@@ -1,3 +1,5 @@
+require File.expand_path '../helper', __FILE__
+
 class TestSquid < MiniTest::Test
   SQUID_LINE = '0 http://cfillion.tk/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'
 
@@ -8,7 +10,7 @@ class TestSquid < MiniTest::Test
   def test_default_action_and_arguments
     assert_output "0 ERR\n" do
       run_with {|uri, extras|
-        assert_equal URI('http://cfillion.tk/'), uri
+        assert_equal URI.parse('http://cfillion.tk/'), uri
         assert_equal [
           '127.0.0.1/localhost.localdomain',
           '-',

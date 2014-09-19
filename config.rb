@@ -1,3 +1,7 @@
+# config do |c|
+#   c.blacklist_db = 'blacklist2.db'
+# end
+
 ads = BlackList.new 'ads'
 trackers = BlackList.new 'trackers'
 
@@ -13,6 +17,6 @@ run proc {|uri, extras|
   end
 
   if ads.include? uri
-    # block
+    replace_by 'http://webfilter.net/block_page'
   end
 }
