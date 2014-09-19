@@ -155,4 +155,15 @@ class TestBlackList < MiniTest::Test
     assert even.include_url? uri
     assert even.include? uri
   end
+
+  def test_group_demo
+    uri = URI.parse('http://youtube.com/watch?v=test')
+
+    even = MiddleSquid::BlackList.new 'even'
+    odd = MiddleSquid::BlackList.new 'odd'
+
+    group = [even, odd]
+
+    assert group.any? {|bl| bl.include? uri }
+  end
 end
