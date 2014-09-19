@@ -13,5 +13,12 @@ class TestUriExt < MiniTest::Test
     assert_equal '/a/b', URI.parse('http://host//a//b//').cleanpath
     assert_equal '/a/b', URI.parse('http://host/./a/./b/').cleanpath
     assert_equal '/b', URI.parse('http://host/../a/../b').cleanpath
+
+    assert_equal '/a', URI.parse('http://host/a/index.html').cleanpath
+    assert_equal '/a', URI.parse('http://host/a/index.php').cleanpath
+    assert_equal '/a', URI.parse('http://host/a/Default.aspx').cleanpath
+    assert_equal '/a', URI.parse('http://host/a/default.aspx').cleanpath
+
+    assert_equal '/a/page.html', URI.parse('http://host/a/page.html').cleanpath
   end
 end
