@@ -6,6 +6,7 @@ class MiddleSquid::Input < EventMachine::Connection
   end
 
   def receive_line(line)
-    @handler.call line
+    # EventMachine sends ASCII-8BIT strings, somehow preventing the databases queries to match
+    @handler.call line.force_encoding(Encoding::UTF_8)
   end
 end

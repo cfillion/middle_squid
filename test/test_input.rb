@@ -9,4 +9,13 @@ class TestInput < MiniTest::Test
 
     assert_equal called_with, 'hello world'
   end
+
+  def test_fix_encoding
+    called_with = nil
+
+    input = MiddleSquid::Input.new nil, proc {|line| called_with = line }
+    input.receive_line ''.force_encoding(Encoding::ASCII_8BIT)
+
+    assert_equal Encoding::UTF_8, called_with.encoding
+  end
 end
