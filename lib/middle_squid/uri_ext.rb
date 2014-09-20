@@ -1,8 +1,8 @@
 module URI
   def cleanhost
     host \
-      .gsub(/\Awww\./, '')
-      .gsub(/\.+\z/, '')
+      .sub(/\Awww\./, '')
+      .sub(/\.+\z/, '')
   end
 
   def cleanpath
