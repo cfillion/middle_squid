@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 
+Signal.trap('INT') { abort }
+
 require 'middle_squid'
 
-config_file = 'config.rb'
-
-ms = MiddleSquid.new
-ms.eval config_file
+MiddleSquid::CLI.start ARGV

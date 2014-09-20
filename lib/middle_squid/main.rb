@@ -20,7 +20,6 @@ class MiddleSquid
     EM.run {
       EM.open_keyboard Input, method(:squid_handler)
     }
-  rescue Interrupt
   end
 
   def action(type, *params)
