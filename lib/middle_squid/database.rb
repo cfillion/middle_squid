@@ -113,7 +113,6 @@ module MiddleSquid::Database
     line.encode! Encoding::UTF_8,
       invalid: :replace, undef: :replace, replace: ''
 
-    line.chomp!
     line.gsub! /\\/, '/'
 
     uri = Addressable::URI.parse "http://#{line}"
