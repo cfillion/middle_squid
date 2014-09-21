@@ -7,12 +7,10 @@ class Addressable::URI
 
   def cleanpath
     p = Pathname.new(path).cleanpath
-    file = p.basename('.*').to_s.downcase
 
-    if %w[index default].include? file
-      p.dirname.to_s
-    else
-      p.to_s
-    end
+    file = p.basename('.*').to_s.downcase
+    p = p.dirname if %w[index default].include? file
+
+    p.to_s[1..-1]
   end
 end

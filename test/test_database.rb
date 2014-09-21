@@ -96,9 +96,9 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', 'google.com', '/adsense'],
-      ['tracker', 'feedproxy.google.com', '/~r'],
-      ['tracker', 'cloudfront-labs.amazonaws.com', '/x.png'],
+      ['adv', 'google.com', 'adsense'],
+      ['tracker', 'feedproxy.google.com', '~r'],
+      ['tracker', 'cloudfront-labs.amazonaws.com', 'x.png'],
     ], urls
 
     assert_match 'indexing adv/urls', stdout
@@ -142,7 +142,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', 'google.com', '/adsense'],
+      ['adv', 'google.com', 'adsense'],
     ], urls
 
     refute_match 'tracker', stdout
@@ -178,7 +178,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'url.com', '/path'],
+      ['cat', 'url.com', 'path'],
     ], urls
   end
 
@@ -196,7 +196,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'google.com', '/path/to/file'],
+      ['cat', 'google.com', 'path/to/file'],
     ], urls
   end
 
@@ -214,7 +214,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'host.com', '/path_with_3_invalid_byte'],
+      ['cat', 'host.com', 'path_with__invalid_byte'],
     ], urls
   end
 
@@ -253,8 +253,8 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'host.com', '/path'],
-      ['copy_of_cat', 'host.com', '/path'],
+      ['cat', 'host.com', 'path'],
+      ['copy_of_cat', 'host.com', 'path'],
     ], urls
 
     assert_match 'found 4 duplicate(s)', stdout

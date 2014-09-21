@@ -8,7 +8,7 @@ class TestBlackList < MiniTest::Test
   }
 
   URLS = [
-    %w[google.com /analytics], %w[youtube.com /watch], %w[github.com /user]
+    %w[google.com analytics], %w[youtube.com watch], %w[github.com user]
   ]
 
   def setup
