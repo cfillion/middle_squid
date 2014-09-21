@@ -7,7 +7,6 @@ class TestDatabase < MiniTest::Test
 
   def setup
     @path = File.expand_path '../resources', __FILE__
-    MiddleSquid::BlackList.class_eval '@@instances.clear'
 
     db.execute 'BEGIN'
 
@@ -21,6 +20,10 @@ class TestDatabase < MiniTest::Test
       ['test', 'test.com', '/path']
 
     db.execute 'END'
+  end
+
+  def teardown
+    MiddleSquid::BlackList.class_eval '@@instances.clear'
   end
 
   def has_test_data?

@@ -30,6 +30,10 @@ class TestBlackList < MiniTest::Test
     db.execute 'END'
   end
 
+  def teardown
+    MiddleSquid::BlackList.class_eval '@@instances.clear'
+  end
+
   def test_category
     bl = MiddleSquid::BlackList.new 'cat_name'
     assert_equal 'cat_name', bl.category
