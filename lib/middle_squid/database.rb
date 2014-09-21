@@ -31,7 +31,7 @@ module MiddleSquid::Database
     SQL
   end
 
-  def self.build(directory)
+  def self.build(*directories)
     start_time = Time.now
     indexed_cats = []
 
@@ -57,32 +57,35 @@ module MiddleSquid::Database
     @@db.execute 'DELETE FROM domains' 
     @@db.execute 'DELETE FROM urls' 
 
-    dir_path = File.expand_path directory
-    puts "reading #{dir_path}"
+    directories.each {|directory|
+      dir_path = File.expand_path directory
+      puts "reading #{dir_path}"
 
-    unless File.directory? dir_path
-      warn "WARNING: #{dir_path}: no such directory"
-    end
-
-    Dir.glob File.join(dir_path, '*/*') do |file|
-      pn = Pathname.new file
-      next unless pn.file?
-
-      category = pn.dirname.basename.to_s
-
-      if MiddleSquid::Config.minimal_indexing
-        next unless used_cats.include? category 
+      unless File.directory? dir_path
+        warn "WARNING: #{dir_path}: no such directory"
+        next
       end
 
-      indexed_cats << category
+      Dir.glob File.join(dir_path, '*/*') do |file|
+        pn = Pathname.new file
+        next unless pn.file?
 
-      puts "indexing #{category}/#{pn.basename}"
+        category = pn.dirname.basename.to_s
 
-      File.foreach(file) { |line|
-        type = append_to category, line
-        total[type] += 1
-      }
-    end
+        if MiddleSquid::Config.minimal_indexing
+          next unless used_cats.include? category
+        end
+
+        indexed_cats << category
+
+        puts "indexing #{category}/#{pn.basename}"
+
+        File.foreach(file) { |line|
+          type = append_to category, line
+          total[type] += 1
+        }
+      end
+    }
 
     if total[:domain] > 0 || total[:url] > 0
       puts 'committing changes'

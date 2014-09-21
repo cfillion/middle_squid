@@ -42,6 +42,22 @@ class TestCLI < MiniTest::Test
     assert_match "reading #{list}", stdout
   end
 
+  def test_build_multiple
+    MiddleSquid::Config.minimal_indexing = false
+
+    path = File.expand_path '../resources', __FILE__
+    config = path + '/hello.rb'
+    list_1 = path + '/black'
+    list_2 = path + '/gray'
+
+    stdout, stderr = capture_io do
+      MiddleSquid::CLI.start(%W[build #{list_1} #{list_2} -C #{config}])
+    end
+
+    assert_match "reading #{list_1}", stdout
+    assert_match "reading #{list_2}", stdout
+  end
+
   def test_version
     stdout, stderr = capture_io do
       MiddleSquid::CLI.start %w[version]

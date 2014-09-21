@@ -13,12 +13,12 @@ class MiddleSquid::CLI < Thor
     ms.eval options[:'config-file']
   end
 
-  desc 'build BLACKLIST', 'populate the blacklist database'
-  def build(directory)
+  desc 'build SOURCES...', 'populate the database from one or more blacklists'
+  def build(*directories)
     ms = MiddleSquid.new
     ms.eval options[:'config-file'], inhibit_run: true
 
-    MiddleSquid::Database.build directory
+    MiddleSquid::Database.build *directories
   end
 
   desc 'version', 'show version and copyright'

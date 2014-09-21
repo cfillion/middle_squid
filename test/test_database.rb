@@ -110,6 +110,44 @@ class TestDatabase < MiniTest::Test
     assert_match 'found 3 url(s)', stdout
     assert_match 'found 0 duplicate(s)', stdout
     assert_match 'committing changes', stdout
+
+    assert_empty stderr
+  end
+
+  def test_index_multiple
+    MiddleSquid::Config.minimal_indexing = false
+
+    stdout, stderr = capture_io do
+      MiddleSquid::Database.build @path + '/black', @path + '/gray'
+    end
+
+    refute has_test_data?
+
+    domains = db.execute 'SELECT category, host FROM domains'
+    assert_equal [
+      ['adv', 'ads.google.com'],
+      ['adv', 'doubleclick.net'],
+      ['tracker', 'xiti.com'],
+      ['tracker', 'google-analytics.com'],
+      ['isp', '000webhost.com'],
+      ['isp', 'comcast.com'],
+      ['news', 'reddit.com'],
+      ['news', 'news.ycombinator.com'],
+    ], domains
+
+    urls = db.execute 'SELECT category, host, path FROM urls'
+    assert_equal [
+      ['adv', 'google.com', 'adsense'],
+      ['tracker', 'feedproxy.google.com', '~r'],
+      ['tracker', 'cloudfront-labs.amazonaws.com', 'x.png'],
+      ['isp', 'telus.com', 'content/internet'],
+    ], urls
+
+    assert_match 'indexed 4 categorie(s): ["adv", "tracker", "isp", "news"]', stdout
+    assert_match 'found 8 domain(s)', stdout
+    assert_match 'found 4 url(s)', stdout
+    assert_match 'found 0 duplicate(s)', stdout
+
     assert_empty stderr
   end
 
@@ -157,9 +195,25 @@ class TestDatabase < MiniTest::Test
       MiddleSquid::Database.build @path + '/404'
     end
 
+    assert has_test_data?
+
     assert_match "reading #{@path + '/404'}", stdout
     assert_match "WARNING: #{@path + '/404'}: no such directory\n", stderr
     assert_match "WARNING: nothing to commit", stderr
+  end
+
+  def test_multiple_not_found
+    MiddleSquid::Config.minimal_indexing = false
+
+    stdout, stderr = capture_io do
+      MiddleSquid::Database.build @path + '/404', @path + '/gray'
+    end
+
+    refute has_test_data?
+
+    assert_match "reading #{@path + '/404'}", stdout
+    assert_match "WARNING: #{@path + '/404'}: no such directory\n", stderr
+    assert_match "reading #{@path + '/gray'}", stdout
   end
 
   def test_mixed
@@ -240,7 +294,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/duplicates'
+      MiddleSquid::Database.build @path + '/duplicates', @path + '/copy_of_duplicates'
     end
 
     refute has_test_data?
@@ -257,7 +311,7 @@ class TestDatabase < MiniTest::Test
       ['copy_of_cat', 'host.com', 'path'],
     ], urls
 
-    assert_match 'found 4 duplicate(s)', stdout
+    assert_match 'found 12 duplicate(s)', stdout
     assert_empty stderr
   end
 
