@@ -7,6 +7,7 @@ class MiddleSquid
 
   def eval(file, inhibit_run: false)
     @inhibit_run = inhibit_run
+
     content = File.read file
     instance_eval content, file
   ensure
@@ -20,6 +21,7 @@ class MiddleSquid
   def run(callback)
     return if @inhibit_run
 
+    BlackList.deadline!
     @user_callback = callback
 
     EM.run {

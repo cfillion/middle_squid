@@ -2,16 +2,20 @@ class MiddleSquid::BlackList
   include MiddleSquid::Database
 
   @@instances = []
+  @@too_late = false
 
-  def self.instances
-    @@instances
-  end
+  def self.instances; @@instances; end
+  def self.deadline!; @@too_late = true; end
 
   attr_reader :category
 
   def initialize(category)
-    @category = category
+    if @@too_late
+      raise MiddleSquid::Error,
+        'blacklists cannot be initialized inside the squid helper'
+    end
 
+    @category = category
     @@instances << self
   end
 

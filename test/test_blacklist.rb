@@ -160,4 +160,17 @@ class TestBlackList < MiniTest::Test
 
     assert group.any? {|bl| bl.include? uri }
   end
+
+  def test_deadline
+    MiddleSquid::BlackList.deadline!
+
+    error = assert_raises MiddleSquid::Error do
+      MiddleSquid::BlackList.new 'test'
+    end
+
+    assert_equal 'blacklists cannot be initialized inside the squid helper', error.message
+  ensure
+    # reset the deadline for the other tests
+    MiddleSquid::BlackList.class_eval '@@too_late = false'
+  end
 end
