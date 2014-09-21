@@ -42,4 +42,12 @@ class TestMain < MiniTest::Test
 
     assert_same MiddleSquid::Config, called_with
   end
+
+  def test_define_action
+    called = false
+    @ms.define_action(:abc) { called = true }
+    @ms.abc
+
+    assert called
+  end
 end

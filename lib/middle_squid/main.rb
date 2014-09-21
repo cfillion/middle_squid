@@ -29,6 +29,10 @@ class MiddleSquid
     }
   end
 
+  def define_action(name, &block)
+    self.class.send :define_method, name, &block
+  end
+
   def action(type, *params)
     raise Action.new(type, params)
   end

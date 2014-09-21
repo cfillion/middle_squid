@@ -9,11 +9,12 @@ trackers = BlackList.new 'tracker'
 
 blocked = [adv, test, trackers]
 
-# define_action :block, proc {
-#   intercept do |req, res|
-#     res.write "This webpage is blocked!"
-#   end
-# }
+define_action :block do
+  replace_by 'http://webfilter.net/block_page'
+  # intercept do |req, res|
+  #   res.write "This webpage is blocked!"
+  # end
+end
 
 run proc {|uri, extras|
   if 'perdu.com' == uri.host
@@ -21,6 +22,6 @@ run proc {|uri, extras|
   end
 
   if blocked.any? {|bl| bl.include? uri }
-    replace_by 'http://webfilter.net/block_page'
+    block
   end
 }
