@@ -3,14 +3,13 @@ require File.expand_path '../helper', __FILE__
 class TestCLI < MiniTest::Test
   def test_exec
     path = File.expand_path '../resources', __FILE__
-    file = path + '/test_eval.rb'
+    conf = path + '/hello.rb'
 
     stdout, stderr = capture_io do
-      retval = MiddleSquid::CLI.start(%W[exec -C #{file}])
-      assert_match /\Ahello #<MiddleSquid:.+>\z/, retval
+      MiddleSquid::CLI.start(%W[exec -C #{conf}])
     end
 
-    assert_empty stdout
+    assert_match /\Ahello #<MiddleSquid:.+>\Z/, stdout
 
     if STDOUT.tty?
       assert_match /should be launched from squid/i, stderr
@@ -26,6 +25,21 @@ class TestCLI < MiniTest::Test
 
     assert_empty stdout
     assert_match /no value provided for required options/i, stderr
+  end
+
+  def test_build
+    MiddleSquid::Config.minimal_indexing = false
+
+    path = File.expand_path '../resources', __FILE__
+    conf = path + '/hello.rb'
+    list = path + '/black'
+
+    stdout, stderr = capture_io do
+      MiddleSquid::CLI.start(%W[build #{list} -C #{conf}])
+    end
+
+    assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
+    assert_match "reading #{list}", stdout
   end
 
   def test_version

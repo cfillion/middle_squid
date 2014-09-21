@@ -1,4 +1,4 @@
-module URI
+class Addressable::URI
   def cleanhost
     host \
       .sub(/\Awww\./, '')
@@ -10,7 +10,7 @@ module URI
     file = p.basename('.*').to_s.downcase
 
     if %w[index default].include? file
-      p.parent.to_s
+      p.dirname.to_s
     else
       p.to_s
     end

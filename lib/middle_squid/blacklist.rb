@@ -1,49 +1,30 @@
 class MiddleSquid::BlackList
-  @@db = nil
+  include MiddleSquid::Database
 
-  def self.prepare_database!
-    return if @@db
+  @@instances = []
 
-    @@db = SQLite3::Database.new MiddleSquid::Config.blacklist_db
-
-    @@db.execute <<-SQL
-    CREATE TABLE IF NOT EXISTS domains (
-      category TEXT,
-      host TEXT
-    )
-    SQL
-
-    @@db.execute <<-SQL
-    CREATE TABLE IF NOT EXISTS urls (
-      category TEXT,
-      host TEXT,
-      path TEXT
-    )
-    SQL
+  def self.instances
+    @@instances
   end
 
-  def initialize(category, domains: true, urls: true)
-    self.class.prepare_database!
+  attr_reader :category
 
+  def initialize(category)
     @category = category
-    @search_domains = domains
-    @search_urls = urls
+
+    @@instances << self
   end
 
   def include_domain?(uri)
-    return false unless @search_domains
-
-    !!@@db.get_first_value(
-      'SELECT 1 FROM domains WHERE category = ? AND host = ?',
+    !!db.get_first_value(
+      'SELECT 1 FROM domains WHERE category = ? AND host = ? LIMIT 1',
       [@category, uri.cleanhost]
     )
   end
 
   def include_url?(uri)
-    return false unless @search_urls
-
-    !!@@db.get_first_value(
-      "SELECT 1 FROM urls WHERE category = ? AND host = ? AND ? LIKE path || '%'",
+    !!db.get_first_value(
+      "SELECT 1 FROM urls WHERE category = ? AND host = ? AND ? LIKE path || '%' LIMIT 1",
       [@category, uri.cleanhost, uri.cleanpath]
     )
   end

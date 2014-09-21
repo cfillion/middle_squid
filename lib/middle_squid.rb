@@ -1,5 +1,6 @@
 require 'middle_squid/version'
 
+require 'addressable/uri'
 require 'eventmachine'
 require 'pathname'
 require 'securerandom'
@@ -7,6 +8,7 @@ require 'sqlite3'
 require 'thor'
 require 'uri'
 
+require 'middle_squid/database'
 require 'middle_squid/blacklist'
 require 'middle_squid/cli'
 require 'middle_squid/config'

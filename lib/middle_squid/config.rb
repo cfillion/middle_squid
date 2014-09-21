@@ -1,7 +1,9 @@
 module MiddleSquid::Config
-  @blacklist_db = 'blacklist.db'
+  @database = 'blacklist.db'
+  @minimal_indexing = true
 
   class << self
-    attr_accessor :blacklist_db
+    attr_accessor :database
+    attr_accessor :minimal_indexing
   end
 end

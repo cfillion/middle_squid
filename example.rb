@@ -1,9 +1,13 @@
-# config do |c|
-#   c.blacklist_db = 'blacklist2.db'
-# end
+config do |c|
+  c.database = 'blacklist.db'
+  c.minimal_indexing = true
+end
 
-ads = BlackList.new 'ads'
-trackers = BlackList.new 'trackers'
+adv = BlackList.new 'adv'
+test = BlackList.new 'test'
+trackers = BlackList.new 'tracker'
+
+blocked = [adv, test, trackers]
 
 # define_action :block, proc {
 #   intercept do |req, res|
@@ -16,7 +20,7 @@ run proc {|uri, extras|
     replace_by 'http://google.com'
   end
 
-  if ads.include? uri
+  if blocked.any? {|bl| bl.include? uri }
     replace_by 'http://webfilter.net/block_page'
   end
 }

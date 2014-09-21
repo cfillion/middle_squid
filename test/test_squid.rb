@@ -1,24 +1,53 @@
 require File.expand_path '../helper', __FILE__
 
 class TestSquid < MiniTest::Test
-  SQUID_LINE = '0 http://cfillion.tk/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'
+  SQUID_LINE = '0 http://éacute.com/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'
 
   def setup
     @ms = MiddleSquid.new
   end
 
-  def test_default_action_and_arguments
+  def run_with(&block)
+    EM.run {
+      @ms.instance_eval do
+        @user_callback = block
+        squid_handler SQUID_LINE
+      end
+
+      EM.next_tick { EM.stop }
+    }
+  end
+
+  def test_uri
+    uri = nil
+
+    capture_io do
+      run_with {|a| uri = a }
+    end
+
+    assert_instance_of Addressable::URI, uri
+    assert_equal 'xn--acute-9ra.com', uri.host # normalized
+  end
+
+  def test_extras
+    extras = nil
+
+    capture_io do
+      run_with {|a, b| extras = b }
+    end
+
+    assert_equal [
+      '127.0.0.1/localhost.localdomain',
+      '-',
+      'GET',
+      'myip=127.0.0.1',
+      'myport=3128'
+    ], extras
+  end
+
+  def test_accept_by_default
     assert_output "0 ERR\n" do
-      run_with {|uri, extras|
-        assert_equal URI.parse('http://cfillion.tk/'), uri
-        assert_equal [
-          '127.0.0.1/localhost.localdomain',
-          '-',
-          'GET',
-          'myip=127.0.0.1',
-          'myport=3128'
-        ], extras
-      }
+      run_with {}
     end
   end
 
@@ -72,17 +101,5 @@ class TestSquid < MiniTest::Test
     end
 
     assert_equal 'invalid action', error.message
-  end
-
-  private
-  def run_with(&block)
-    EM.run {
-      @ms.instance_eval do
-        @user_callback = block
-        squid_handler SQUID_LINE
-      end
-
-      EM.next_tick { EM.stop }
-    }
   end
 end

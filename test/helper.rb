@@ -8,4 +8,4 @@ SimpleCov.start {
 
 require 'middle_squid'
 
-MiddleSquid::Config.blacklist_db = ':memory:'
+MiddleSquid::Config.database = ':memory:'

@@ -1,6 +1,8 @@
 require File.expand_path '../helper', __FILE__
 
 class TestBlackList < MiniTest::Test
+  include MiddleSquid::Database
+
   DOMAINS = %w{
     cfillion.tk duckduckgo.com stackoverflow.com analytics.google.com anidb.net
   }
@@ -10,9 +12,6 @@ class TestBlackList < MiniTest::Test
   ]
 
   def setup
-    MiddleSquid::BlackList.prepare_database!
-
-    db = MiddleSquid::BlackList.class_eval '@@db'
     db.execute 'BEGIN'
 
     db.execute 'DELETE FROM domains' 
@@ -31,16 +30,24 @@ class TestBlackList < MiniTest::Test
     db.execute 'END'
   end
 
-  def test_reuse_db
-    before = MiddleSquid::BlackList.class_eval '@@db'
-    MiddleSquid::BlackList.prepare_database!
-    after = MiddleSquid::BlackList.class_eval '@@db'
+  def test_category
+    bl = MiddleSquid::BlackList.new 'cat_name'
+    assert_equal 'cat_name', bl.category
+  end
 
-    assert_same before, after
+  def test_instances
+    MiddleSquid::BlackList.class_eval '@@instances = []'
+
+    assert_empty MiddleSquid::BlackList.instances
+
+    first = MiddleSquid::BlackList.new 'neko'
+    second = MiddleSquid::BlackList.new 'inu'
+
+    assert_equal [first, second], MiddleSquid::BlackList.instances
   end
 
   def test_unmatch
-    uri = URI.parse('http://anidb.net/a9002')
+    uri = Addressable::URI.parse('http://anidb.net/a9002')
     odd = MiddleSquid::BlackList.new 'odd'
 
     refute odd.include_domain? uri
@@ -49,41 +56,35 @@ class TestBlackList < MiniTest::Test
   end
 
   def test_domain
-    uri = URI.parse('http://cfillion.tk/love-of-babble/')
-    even = MiddleSquid::BlackList.new 'even', urls: false
+    uri = Addressable::URI.parse('http://cfillion.tk/love-of-babble/')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_domain? uri
+    refute even.include_url? uri
     assert even.include? uri
   end
 
-  def test_domain_disabled
-    uri = URI.parse('http://analytics.google.com/')
-    odd = MiddleSquid::BlackList.new 'odd', domains: false, urls: false
-
-    refute odd.include_domain? uri
-    refute odd.include? uri
-  end
 
   def test_domain_www
-    uri = URI.parse('http://www.anidb.net/')
-    even = MiddleSquid::BlackList.new 'even', urls: false
+    uri = Addressable::URI.parse('http://www.anidb.net/')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_domain? uri
     assert even.include? uri
   end
 
   def test_domain_trailing_dots
-    uri = URI.parse('http://cfillion.tk...')
-    even = MiddleSquid::BlackList.new 'even', urls: false
+    uri = Addressable::URI.parse('http://cfillion.tk...')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_domain? uri
     assert even.include? uri
   end
 
   def test_domain_partial_match
-    uri1 = URI.parse('http://google.com')
-    uri2 = URI.parse('http://duckduckgo/')
-    odd = MiddleSquid::BlackList.new 'odd', urls: false
+    uri1 = Addressable::URI.parse('http://google.com')
+    uri2 = Addressable::URI.parse('http://duckduckgo/')
+    odd = MiddleSquid::BlackList.new 'odd'
 
     refute odd.include_domain? uri1
     refute odd.include? uri1
@@ -93,71 +94,64 @@ class TestBlackList < MiniTest::Test
   end
 
   def test_url
-    uri = URI.parse('http://google.com/analytics')
-    even = MiddleSquid::BlackList.new 'even', domains: false
+    uri = Addressable::URI.parse('http://google.com/analytics')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_url? uri
+    refute even.include_domain? uri
     assert even.include? uri
   end
 
-  def test_url_disabled
-    uri = URI.parse('http://google.com/analytics')
-    even = MiddleSquid::BlackList.new 'even', domains: false, urls: false
-
-    refute even.include_url? uri
-    refute even.include? uri
-  end
-
   def test_url_www
-    uri = URI.parse('http://www.google.com/analytics')
-    even = MiddleSquid::BlackList.new 'even', domains: false
+    uri = Addressable::URI.parse('http://www.google.com/analytics')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_url? uri
     assert even.include? uri
   end
 
   def test_url_tailing_dots
-    uri = URI.parse('http://www.google.com.../analytics')
-    even = MiddleSquid::BlackList.new 'even', domains: false
+    uri = Addressable::URI.parse('http://www.google.com.../analytics')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_url? uri
     assert even.include? uri
   end
 
   def test_url_partial_domain
-    uri = URI.parse('http://youtube/watch')
-    odd = MiddleSquid::BlackList.new 'odd', domains: false
+    uri = Addressable::URI.parse('http://youtube/watch')
+    odd = MiddleSquid::BlackList.new 'odd'
 
     refute odd.include_url? uri
     refute odd.include? uri
   end
 
   def test_url_longer_path
-    uri = URI.parse('http://github.com/user/repository')
-    even = MiddleSquid::BlackList.new 'even', domains: false
+    uri = Addressable::URI.parse('http://github.com/user/repository')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_url? uri
     assert even.include? uri
   end
 
   def test_url_partial_path
-    uri = URI.parse('http://github.com/us')
-    even = MiddleSquid::BlackList.new 'even', domains: false
+    uri = Addressable::URI.parse('http://github.com/us')
+    even = MiddleSquid::BlackList.new 'even'
 
     refute even.include_url? uri
     refute even.include? uri
   end
 
   def test_url_cheap_tricks
-    uri = URI.parse('http://google.com//maps/../analytics/./')
-    even = MiddleSquid::BlackList.new 'even', domains: false
+    uri = Addressable::URI.parse('http://google.com//maps/../analytics/./')
+    even = MiddleSquid::BlackList.new 'even'
 
     assert even.include_url? uri
     assert even.include? uri
   end
 
   def test_group_demo
-    uri = URI.parse('http://youtube.com/watch?v=test')
+    uri = Addressable::URI.parse('http://youtube.com/watch?v=test')
 
     even = MiddleSquid::BlackList.new 'even'
     odd = MiddleSquid::BlackList.new 'odd'

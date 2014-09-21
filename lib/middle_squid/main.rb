@@ -5,9 +5,12 @@ class MiddleSquid
     @tokens = {}
   end
 
-  def eval(file)
+  def eval(file, inhibit_run: false)
+    @inhibit_run = inhibit_run
     content = File.read file
     instance_eval content, file
+  ensure
+    @inhibit_run = false
   end
 
   def config
@@ -15,6 +18,8 @@ class MiddleSquid
   end
 
   def run(callback)
+    return if @inhibit_run
+
     @user_callback = callback
 
     EM.run {
@@ -51,7 +56,12 @@ class MiddleSquid
   # @see http://wiki.squid-cache.org/Features/Redirectors
   def squid_handler(line)
     chan_id, url, *extras = line.split
-    @user_callback.call URI.parse(url), extras
+
+    uri = Addressable::URI.parse url
+    uri.normalize!
+
+    @user_callback.call uri, extras
+
     accept
   rescue Action => action
     case action.type
