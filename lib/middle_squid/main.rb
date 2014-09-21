@@ -61,7 +61,11 @@ class MiddleSquid
   private
   # @see http://wiki.squid-cache.org/Features/Redirectors
   def squid_handler(line)
-    chan_id, url, *extras = line.split
+    parts = line.split
+
+    chan_id = Config.concurrency ? parts.shift : nil
+    url, *extras = parts
+
     uri = Addressable::URI.parse url
 
     @user_callback.call uri, extras
@@ -70,13 +74,13 @@ class MiddleSquid
   rescue Action => action
     case action.type
     when :accept
-      puts "#{chan_id} ERR"
+      puts gen_line(chan_id, 'ERR')
     when :drop
       # no output: see #drop documentation
     when :redirect
-      puts "#{chan_id} #{gen_redirect action.params[0], action.params[1]}"
+      puts gen_line(chan_id, gen_redirect(action.params[0], action.params[1]))
     when :replace
-      puts "#{chan_id} #{gen_replace action.params[0]}"
+      puts gen_line(chan_id, gen_replace(action.params[0]))
     when :intercept
       token = SecureRandom.uuid
       @tokens[token] = action.params[0]
@@ -86,7 +90,7 @@ class MiddleSquid
         @tokens.delete token
       }
 
-      puts "#{chan_id} #{gen_replace "http://127.0.0.1:8918/#{token}"}"
+      puts gen_line(chan_id, gen_replace("http://127.0.0.1:8918/#{token}"))
     else
       raise Error, 'invalid action'
     end
@@ -98,5 +102,9 @@ class MiddleSquid
 
   def gen_redirect(status, new_url)
     "OK status=#{status} url=#{URI.escape new_url}"
+  end
+
+  def gen_line(chan_id, line)
+    chan_id ? "#{chan_id} #{line}" : line
   end
 end
