@@ -1,7 +1,7 @@
 require File.expand_path '../helper', __FILE__
 
 class TestSquid < MiniTest::Test
-  SQUID_LINE = '0 http://éacute.com/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'
+  SQUID_LINE = '0 http://cfillion.tk/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'
 
   def setup
     @ms = MiddleSquid.new
@@ -26,7 +26,6 @@ class TestSquid < MiniTest::Test
     end
 
     assert_instance_of Addressable::URI, uri
-    assert_equal 'xn--acute-9ra.com', uri.host # normalized
   end
 
   def test_extras

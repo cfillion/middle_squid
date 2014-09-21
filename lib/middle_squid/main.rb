@@ -56,9 +56,7 @@ class MiddleSquid
   # @see http://wiki.squid-cache.org/Features/Redirectors
   def squid_handler(line)
     chan_id, url, *extras = line.split
-
     uri = Addressable::URI.parse url
-    uri.normalize!
 
     @user_callback.call uri, extras
 

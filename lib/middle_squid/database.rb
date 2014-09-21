@@ -117,15 +117,15 @@ module MiddleSquid::Database
     line.gsub! /\\/, '/'
 
     uri = Addressable::URI.parse "http://#{line}"
-    uri.normalize!
+    host, path = uri.cleanhost, uri.cleanpath
 
-    if uri.path == '/'
+    if path.empty?
       @@db.execute 'INSERT INTO domains (category, host) VALUES (?, ?)',
-        [category, uri.cleanhost]
+        [category, host]
       :domain
     else
       @@db.execute 'INSERT INTO urls (category, host, path) VALUES (?, ?, ?)',
-        [category, uri.cleanhost, uri.cleanpath]
+        [category, host, path]
       :url
     end
   rescue SQLite3::ConstraintException
