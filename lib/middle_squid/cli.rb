@@ -9,14 +9,19 @@ class MiddleSquid::CLI < Thor
   def exec
     warn "[MiddleSquid] WARNING: STDOUT is a terminal. This command should be launched from squid." if STDOUT.tty?
 
+    config_file = File.expand_path options[:'config-file']
+
     ms = MiddleSquid.new
-    ms.eval options[:'config-file']
+    ms.eval config_file
   end
 
   desc 'build SOURCES...', 'populate the database from one or more blacklists'
   def build(*directories)
+    config_file = File.expand_path options[:'config-file']
+    directories.map! {|rel| File.expand_path rel }
+
     ms = MiddleSquid.new
-    ms.eval options[:'config-file'], inhibit_run: true
+    ms.eval config_file, inhibit_run: true
 
     MiddleSquid::Database.build *directories
   end

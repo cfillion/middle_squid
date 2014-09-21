@@ -58,15 +58,14 @@ module MiddleSquid::Database
     @@db.execute 'DELETE FROM urls' 
 
     directories.each {|directory|
-      dir_path = File.expand_path directory
-      puts "reading #{dir_path}"
+      puts "reading #{directory}"
 
-      unless File.directory? dir_path
-        warn "WARNING: #{dir_path}: no such directory"
+      unless File.directory? directory
+        warn "WARNING: #{directory}: no such directory"
         next
       end
 
-      Dir.glob File.join(dir_path, '*/*') do |file|
+      Dir.glob File.join(directory, '*/*') do |file|
         pn = Pathname.new file
         next unless pn.file?
 
