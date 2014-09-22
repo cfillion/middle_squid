@@ -33,10 +33,6 @@ class MiddleSquid
     self.class.send :define_method, name, &block
   end
 
-  def action(type, *params)
-    raise Action.new(type, params)
-  end
-
   def accept
     action :accept
   end
@@ -55,7 +51,19 @@ class MiddleSquid
 
   def intercept(&block)
     raise ArgumentError, 'no block given' unless block_given?
-    action :intercept, block
+
+    token = SecureRandom.uuid
+    @tokens[token] = block
+
+    EM.add_timer(PURGE_DELAY) {
+      @tokens.delete token
+    }
+
+    replace_by "http://#{@srv_host}:#{@srv_port}/#{token}"
+  end
+
+  def action(type, *params)
+    raise Action.new(type, params)
   end
 
   private
@@ -70,7 +78,7 @@ class MiddleSquid
 
     @user_callback.call uri, extras
 
-    accept
+    accept # default action
   rescue Action => action
     case action.type
     when :accept
@@ -78,30 +86,14 @@ class MiddleSquid
     when :drop
       # no output: see #drop documentation
     when :redirect
-      gen_line chan_id, gen_redirect(action.params[0], action.params[1])
+      status, new_url = action.params
+      gen_line chan_id, "OK status=#{status} url=#{URI.escape new_url}"
     when :replace
-      gen_line chan_id, gen_replace(action.params[0])
-    when :intercept
-      token = SecureRandom.uuid
-      @tokens[token] = action.params[0]
-
-      EM.add_timer(PURGE_DELAY) {
-        # in case the server never get the request
-        @tokens.delete token
-      }
-
-      gen_line chan_id, gen_replace("http://127.0.0.1:8918/#{token}")
+      new_url = action.params.first
+      gen_line chan_id, "OK rewrite-url=#{URI.escape new_url}"
     else
       raise Error, 'invalid action'
     end
-  end
-
-  def gen_replace(new_url)
-    "OK rewrite-url=#{URI.escape new_url}"
-  end
-
-  def gen_redirect(status, new_url)
-    "OK status=#{status} url=#{URI.escape new_url}"
   end
 
   def gen_line(chan_id, line)

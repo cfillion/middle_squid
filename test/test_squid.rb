@@ -14,6 +14,9 @@ class TestSquid < MiniTest::Test
     EM.run {
       @ms.instance_eval do
         @user_callback = block
+        @srv_host = '127.0.0.1'
+        @srv_port = '8918'
+
         reply = squid_handler line
       end
 
