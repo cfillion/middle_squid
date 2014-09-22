@@ -9,14 +9,18 @@ class TestSquid < MiniTest::Test
   end
 
   def run_with(line, &block)
+    reply = nil
+
     EM.run {
       @ms.instance_eval do
         @user_callback = block
-        squid_handler line
+        reply = squid_handler line
       end
 
       EM.next_tick { EM.stop }
     }
+
+    reply
   end
 
   def test_uri
@@ -24,9 +28,7 @@ class TestSquid < MiniTest::Test
 
     uri = nil
 
-    capture_io do
-      run_with(SQUID_LINE) {|a| uri = a }
-    end
+    run_with(SQUID_LINE) {|a| uri = a }
 
     assert_instance_of Addressable::URI, uri
     assert_equal 'cfillion.tk', uri.host
@@ -37,9 +39,7 @@ class TestSquid < MiniTest::Test
 
     uri = nil
 
-    capture_io do
-      run_with(CONCURRENT_LINE) {|a| uri = a }
-    end
+    run_with(CONCURRENT_LINE) {|a| uri = a }
 
     assert_instance_of Addressable::URI, uri
     assert_equal 'cfillion.tk', uri.host
@@ -50,9 +50,7 @@ class TestSquid < MiniTest::Test
 
     extras = nil
 
-    capture_io do
-      run_with(SQUID_LINE) {|a, b| extras = b }
-    end
+    run_with(SQUID_LINE) {|a, b| extras = b }
 
     assert_equal [
       '127.0.0.1/localhost.localdomain',
@@ -68,9 +66,7 @@ class TestSquid < MiniTest::Test
 
     extras = nil
 
-    capture_io do
-      run_with(CONCURRENT_LINE) {|a, b| extras = b }
-    end
+    run_with(CONCURRENT_LINE) {|a, b| extras = b }
 
     assert_equal [
       '127.0.0.1/localhost.localdomain',
@@ -84,104 +80,104 @@ class TestSquid < MiniTest::Test
   def test_accept_by_default
     MiddleSquid::Config.concurrency = false
 
-    assert_output "ERR\n" do
-      run_with(SQUID_LINE) {}
-    end
+    reply = run_with(SQUID_LINE) {}
+
+    assert_equal 'ERR', reply
   end
 
   def test_accept
     MiddleSquid::Config.concurrency = false
 
-    assert_output "ERR\n" do
-      run_with(SQUID_LINE) { @ms.accept; flunk }
-    end
+    reply = run_with(SQUID_LINE) { @ms.accept; flunk }
+
+    assert_equal 'ERR', reply
   end
 
   def test_accept_concurrent
     MiddleSquid::Config.concurrency = true
 
-    assert_output "0 ERR\n" do
-      run_with(CONCURRENT_LINE) { @ms.accept; flunk }
-    end
+    reply = run_with(CONCURRENT_LINE) { @ms.accept; flunk }
+
+    assert_equal '0 ERR', reply
   end
 
   def test_drop
     MiddleSquid::Config.concurrency = false
 
-    assert_output '' do
-      run_with(SQUID_LINE) { @ms.drop; flunk }
-    end
+    reply = run_with(SQUID_LINE) { @ms.drop; flunk }
+
+    assert_nil reply
   end
 
   def test_redirect_301
     MiddleSquid::Config.concurrency = false
 
-    assert_output "OK status=301 url=http://duckduckgo.com/?q=cfillion%20tk\n" do
-      run_with(SQUID_LINE) {
-        @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk'
-        flunk
-      }
-    end
+    reply = run_with(SQUID_LINE) {
+      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk'
+      flunk
+    }
+
+    assert_equal 'OK status=301 url=http://duckduckgo.com/?q=cfillion%20tk', reply
   end
 
   def test_redirect_concurrent
     MiddleSquid::Config.concurrency = true
 
-    assert_output "0 OK status=301 url=http://duckduckgo.com/?q=cfillion%20tk\n" do
-      run_with(CONCURRENT_LINE) {
-        @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk'
-        flunk
-      }
-    end
+    reply = run_with(CONCURRENT_LINE) {
+      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk'
+      flunk
+    }
+
+    assert_equal '0 OK status=301 url=http://duckduckgo.com/?q=cfillion%20tk', reply
   end
 
   def test_redirect_custom_status
     MiddleSquid::Config.concurrency = false
 
-    assert_output "OK status=418 url=http://duckduckgo.com/?q=cfillion%20tk\n" do
-      run_with(SQUID_LINE) {
-        @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk', 418
-        flunk
-      }
-    end
+    reply = run_with(SQUID_LINE) {
+      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk', 418
+      flunk
+    }
+
+    assert_equal 'OK status=418 url=http://duckduckgo.com/?q=cfillion%20tk', reply
   end
 
   def test_replace
     MiddleSquid::Config.concurrency = false
 
-    assert_output "OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk\n" do
-      run_with(SQUID_LINE) {
-        @ms.replace_by 'http://duckduckgo.com/?q=cfillion tk'
-        flunk
-      }
-    end
+    reply = run_with(SQUID_LINE) {
+      @ms.replace_by 'http://duckduckgo.com/?q=cfillion tk'
+      flunk
+    }
+
+    assert_equal 'OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk', reply
   end
 
   def test_replace_concurrent
     MiddleSquid::Config.concurrency = true
 
-    assert_output "0 OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk\n" do
-      run_with(CONCURRENT_LINE) {
-        @ms.replace_by 'http://duckduckgo.com/?q=cfillion tk'
-        flunk
-      }
-    end
+    reply = run_with(CONCURRENT_LINE) {
+      @ms.replace_by 'http://duckduckgo.com/?q=cfillion tk'
+      flunk
+    }
+
+    assert_equal '0 OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk', reply
   end
 
   def test_intercept
     MiddleSquid::Config.concurrency = false
 
-    assert_output /\AOK rewrite-url=http:\/\/127.0.0.1:8918\/[\w-]+\Z/ do
-      run_with(SQUID_LINE) { @ms.intercept {}; flunk }
-    end
+    reply = run_with(SQUID_LINE) { @ms.intercept {}; flunk }
+
+    assert_match /\AOK rewrite-url=http:\/\/127.0.0.1:8918\/[\w-]+\z/, reply
   end
 
   def test_intercept_concurrent
     MiddleSquid::Config.concurrency = true
 
-    assert_output /\A0 OK rewrite-url=http:\/\/127.0.0.1:8918\/[\w-]+\Z/ do
-      run_with(CONCURRENT_LINE) { @ms.intercept {}; flunk }
-    end
+    reply = run_with(CONCURRENT_LINE) { @ms.intercept {}; flunk }
+
+    assert_match /\A0 OK rewrite-url=http:\/\/127.0.0.1:8918\/[\w-]+\z/, reply
   end
 
   def test_intercept_no_block

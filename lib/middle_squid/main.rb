@@ -25,7 +25,7 @@ class MiddleSquid
     @user_callback = callback
 
     EM.run {
-      EM.open_keyboard Input, method(:squid_handler)
+      EM.open_keyboard Handlers::Input, method(:squid_handler)
     }
   end
 
@@ -74,13 +74,13 @@ class MiddleSquid
   rescue Action => action
     case action.type
     when :accept
-      puts gen_line(chan_id, 'ERR')
+      gen_line chan_id, 'ERR'
     when :drop
       # no output: see #drop documentation
     when :redirect
-      puts gen_line(chan_id, gen_redirect(action.params[0], action.params[1]))
+      gen_line chan_id, gen_redirect(action.params[0], action.params[1])
     when :replace
-      puts gen_line(chan_id, gen_replace(action.params[0]))
+      gen_line chan_id, gen_replace(action.params[0])
     when :intercept
       token = SecureRandom.uuid
       @tokens[token] = action.params[0]
@@ -90,7 +90,7 @@ class MiddleSquid
         @tokens.delete token
       }
 
-      puts gen_line(chan_id, gen_replace("http://127.0.0.1:8918/#{token}"))
+      gen_line chan_id, gen_replace("http://127.0.0.1:8918/#{token}")
     else
       raise Error, 'invalid action'
     end
