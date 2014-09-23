@@ -29,6 +29,10 @@ module MiddleSquid::Database
       category, host, path
     )
     SQL
+
+    # minimize downtime due to locks when the database is rebuilding
+    # see http://www.sqlite.org/wal.html
+    @@db.execute 'PRAGMA journal_mode=WAL'
   end
 
   def self.build(*directories)
@@ -115,7 +119,7 @@ module MiddleSquid::Database
     line.encode! Encoding::UTF_8,
       invalid: :replace, undef: :replace, replace: ''
 
-    line.gsub! /\\/, '/'
+    line.tr! '\\', '/'
 
     uri = Addressable::URI.parse "http://#{line}"
     host, path = uri.cleanhost, uri.cleanpath

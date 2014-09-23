@@ -8,7 +8,7 @@ class TestDatabase < MiniTest::Test
   def setup
     @path = File.expand_path '../resources', __FILE__
 
-    db.execute 'BEGIN'
+    db.transaction
 
     db.execute 'DELETE FROM domains' 
     db.execute 'DELETE FROM urls' 
@@ -19,7 +19,7 @@ class TestDatabase < MiniTest::Test
     db.execute 'INSERT INTO urls (category, host, path) VALUES (?, ?, ?)',
       ['test', 'test.com', '/path']
 
-    db.execute 'END'
+    db.commit
   end
 
   def teardown
