@@ -127,7 +127,6 @@ class TestMain < MiniTest::Test
     action = assert_raises MiddleSquid::Action do
       EM.run {
         @ms.intercept {}
-        EM.next_tick { EM.stop }
       }
     end
 

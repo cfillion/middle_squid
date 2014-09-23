@@ -11,6 +11,7 @@ class TestCLI < MiniTest::Test
 
     assert_match /\Ahello #<MiddleSquid:.+>\Z/, stdout
 
+    # FIXME: I don't know how to test both cases
     if STDOUT.tty?
       assert_match /should be launched from squid/i, stderr
     else
