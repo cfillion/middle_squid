@@ -55,7 +55,7 @@ module MiddleSquid::Database
     }
 
     setup
-    @@db.execute 'BEGIN'
+    @@db.transaction
 
     puts "truncating database"
     @@db.execute 'DELETE FROM domains' 
@@ -92,11 +92,11 @@ module MiddleSquid::Database
 
     if total[:domain] > 0 || total[:url] > 0
       puts 'committing changes'
-      @@db.execute 'END'
+      @@db.commit
     else
       warn 'WARNING: nothing to commit'
       puts 'reverting changes'
-      @@db.execute 'ROLLBACK'
+      @@db.rollback
     end
 
     indexed_cats.uniq!

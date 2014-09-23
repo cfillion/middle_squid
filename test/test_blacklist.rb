@@ -12,7 +12,7 @@ class TestBlackList < MiniTest::Test
   ]
 
   def setup
-    db.execute 'BEGIN'
+    db.transaction
 
     db.execute 'DELETE FROM domains' 
     db.execute 'DELETE FROM urls' 
@@ -27,7 +27,7 @@ class TestBlackList < MiniTest::Test
         [index % 2 == 0 ? 'even' : 'odd', *url]
     }
 
-    db.execute 'END'
+    db.commit
   end
 
   def teardown
@@ -67,7 +67,6 @@ class TestBlackList < MiniTest::Test
     refute even.include_url? uri
     assert even.include? uri
   end
-
 
   def test_domain_www
     uri = Addressable::URI.parse('http://www.anidb.net/')
