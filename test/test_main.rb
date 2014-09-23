@@ -48,6 +48,11 @@ class TestMain < MiniTest::Test
     assert_equal [[MiddleSquid::Config]], bag
   end
 
+  def test_internal_server_address
+    assert_nil @ms.server_host
+    assert_nil @ms.server_port
+  end
+
   def test_define_action
     bag = []
 
@@ -58,7 +63,7 @@ class TestMain < MiniTest::Test
     refute_includes MiddleSquid.instance_methods, :hello
   end
 
-  def test_define_action_require_block
+  def test_define_action_requires_a_block
     assert_raises ArgumentError do
       @ms.define_action :test
     end
@@ -222,5 +227,27 @@ class TestMain < MiniTest::Test
     end
 
     assert_equal 'OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk', action.line
+  end
+
+  def test_intercept
+    @ms.instance_eval do
+      @server_host = '127.0.0.1'
+      @server_port = 8901
+    end
+
+    action = assert_raises MiddleSquid::Action do
+      EM.run {
+        @ms.intercept {}
+        EM.next_tick { EM.stop }
+      }
+    end
+
+    assert_match /\AOK rewrite-url=http:\/\/127.0.0.1:8901\/[\w-]+\z/, action.line
+  end
+
+  def test_intercept_requires_a_block
+    assert_raises ArgumentError do
+      @ms.intercept
+    end
   end
 end

@@ -1,5 +1,8 @@
 class MiddleSquid
   PURGE_DELAY = 10
+  SERVER_HOST = '127.0.0.1'.freeze
+
+  attr_reader :server_host, :server_port
 
   def initialize
     @custom_actions = {}
@@ -57,11 +60,10 @@ class MiddleSquid
     @tokens[token] = block
 
     EM.add_timer(PURGE_DELAY) {
-      puts 'deleted'
       @tokens.delete token
     }
 
-    replace_by "http://#{@srv_host}:#{@srv_port}/#{token}"
+    replace_by "http://#{@server_host}:#{@server_port}/#{token}"
   end
 
   def define_action(name, &block)
