@@ -51,11 +51,17 @@ class TestMain < MiniTest::Test
   def test_define_action
     bag = []
 
-    @ms.define_action(:abc) {|*args| bag << args }
-    @ms.abc :hello
+    @ms.define_action(:hello) {|*args| bag << args }
+    @ms.hello :world
 
-    assert_equal [[:hello]], bag
-    refute_includes MiddleSquid.instance_methods, :abc
+    assert_equal [[:world]], bag
+    refute_includes MiddleSquid.instance_methods, :hello
+  end
+
+  def test_define_action_require_block
+    assert_raises ArgumentError do
+      @ms.define_action :test
+    end
   end
 
   def test_method_missing

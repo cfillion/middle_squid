@@ -46,28 +46,27 @@ class MiddleSquid
     action "OK status=#{status} url=#{URI.escape url}"
   end
 
-  def replace_by(url = nil)
-    unless url
-      token = SecureRandom.uuid
-      @tokens[token] = Proc.new
-
-      EM.add_timer(PURGE_DELAY) {
-        @tokens.delete token
-      }
-
-      url = "http://#{@srv_host}:#{@srv_port}/#{token}"
-    end
-
+  def replace_by(url)
     action "OK rewrite-url=#{URI.escape url}"
   end
 
   def intercept(&block)
     raise ArgumentError, 'no block given' unless block_given?
 
-    replace_by &block
+    token = SecureRandom.uuid
+    @tokens[token] = block
+
+    EM.add_timer(PURGE_DELAY) {
+      puts 'deleted'
+      @tokens.delete token
+    }
+
+    replace_by "http://#{@srv_host}:#{@srv_port}/#{token}"
   end
 
   def define_action(name, &block)
+    raise ArgumentError, 'no block given' unless block_given?
+
     @custom_actions[name] = block
   end
 
