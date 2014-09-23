@@ -2,6 +2,7 @@ class MiddleSquid
   PURGE_DELAY = 10
 
   def initialize
+    @custom_actions = {}
     @tokens = {}
   end
 
@@ -27,10 +28,6 @@ class MiddleSquid
     EM.run {
       EM.open_keyboard Handlers::Input, method(:squid_handler)
     }
-  end
-
-  def define_action(name, &block)
-    self.class.send :define_method, name, &block
   end
 
   def action(line)
@@ -68,6 +65,17 @@ class MiddleSquid
     raise ArgumentError, 'no block given' unless block_given?
 
     replace_by &block
+  end
+
+  def define_action(name, &block)
+    @custom_actions[name] = block
+  end
+
+  def method_missing(name, *args)
+    custom_action = @custom_actions[name]
+    super unless custom_action
+
+    custom_action.call *args
   end
 
   private

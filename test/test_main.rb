@@ -55,6 +55,13 @@ class TestMain < MiniTest::Test
     @ms.abc :hello
 
     assert_equal [[:hello]], bag
+    refute_includes MiddleSquid.instance_methods, :abc
+  end
+
+  def test_method_missing
+    assert_raises NoMethodError do
+      @ms.not_found
+    end
   end
 
   def test_action
