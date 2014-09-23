@@ -26,10 +26,22 @@ class MiddleSquid
     return if @inhibit_run
 
     BlackList.deadline!
+
     @user_callback = callback
 
     EM.run {
       EM.open_keyboard Handlers::Input, method(:squid_handler)
+
+      Thin::Logging.level = Logger::WARN
+
+      server = Thin::Server.new SERVER_HOST, 0, method(:http_handler),
+        :backend => Handlers::HTTP,
+        :signals => false
+
+      server.start
+
+      sockname = EM.get_sockname server.backend.signature
+      @server_port, @server_host = Socket.unpack_sockaddr_in sockname
     }
   end
 
@@ -97,5 +109,26 @@ class MiddleSquid
     chan_id ? "#{chan_id} #{action.line}" : action.line if action.line
   rescue InvalidURI, Addressable::URI::InvalidURIError
     warn "[MiddleSquid] invalid uri received: '#{url}'\n\tin '#{line}'"
+  end
+
+  def http_handler(env)
+    callback = @tokens[env['PATH_INFO'][1..-1]]
+
+    return [
+      404,
+      {'Content-Type' => 'text/plain'},
+      ['[MiddleSquid] Invalid Token']
+    ] unless callback
+
+    request  = Rack::Request.new env
+    response = Thin::AsyncResponse.new env
+
+    Fiber.new {
+      callback.call request, response
+
+      response.done
+    }.resume
+
+    response.finish
   end
 end

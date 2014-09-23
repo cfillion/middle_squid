@@ -13,4 +13,12 @@ module MiddleSquid::Handlers
       puts reply if reply
     end
   end
+
+  class HTTP < Thin::Backends::TcpServer
+    attr_reader :signature
+
+    def initialize(host, port, options)
+      super host, port
+    end
+  end
 end

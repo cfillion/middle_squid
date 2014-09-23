@@ -1,12 +1,15 @@
 require 'middle_squid/version'
 
-require 'addressable/uri'
-require 'eventmachine'
+require 'fiber'
 require 'pathname'
 require 'securerandom'
+
+require 'addressable/uri'
+require 'eventmachine'
 require 'sqlite3'
+require 'thin'
+require 'thin/async'
 require 'thor'
-require 'uri'
 
 require 'middle_squid/database'
 require 'middle_squid/blacklist'

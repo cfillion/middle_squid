@@ -40,4 +40,8 @@ class TestHandlers < MiniTest::Test
 
     assert_equal Encoding::UTF_8, bag[0].encoding
   end
+
+  def test_http_constructor
+    MiddleSquid::Handlers::HTTP.new '', 0, []
+  end
 end
