@@ -33,37 +33,41 @@ class MiddleSquid
     self.class.send :define_method, name, &block
   end
 
+  def action(line)
+    raise Action.new(line)
+  end
+
   def accept
-    action :accept
+    action 'ERR'
   end
 
   def drop
-    action :drop
+    action nil
   end
 
-  def redirect_to(url, status = 301)
-    action :redirect, status, url
+  def redirect_to(url, status: 301)
+    action "OK status=#{status} url=#{URI.escape url}"
   end
 
-  def replace_by(url)
-    action :replace, url
+  def replace_by(url = nil)
+    unless url
+      token = SecureRandom.uuid
+      @tokens[token] = Proc.new
+
+      EM.add_timer(PURGE_DELAY) {
+        @tokens.delete token
+      }
+
+      url = "http://#{@srv_host}:#{@srv_port}/#{token}"
+    end
+
+    action "OK rewrite-url=#{URI.escape url}"
   end
 
   def intercept(&block)
     raise ArgumentError, 'no block given' unless block_given?
 
-    token = SecureRandom.uuid
-    @tokens[token] = block
-
-    EM.add_timer(PURGE_DELAY) {
-      @tokens.delete token
-    }
-
-    replace_by "http://#{@srv_host}:#{@srv_port}/#{token}"
-  end
-
-  def action(type, *params)
-    raise Action.new(type, params)
+    replace_by &block
   end
 
   private
@@ -80,23 +84,6 @@ class MiddleSquid
 
     accept # default action
   rescue Action => action
-    case action.type
-    when :accept
-      gen_line chan_id, 'ERR'
-    when :drop
-      # no output: see #drop documentation
-    when :redirect
-      status, new_url = action.params
-      gen_line chan_id, "OK status=#{status} url=#{URI.escape new_url}"
-    when :replace
-      new_url = action.params.first
-      gen_line chan_id, "OK rewrite-url=#{URI.escape new_url}"
-    else
-      raise Error, 'invalid action'
-    end
-  end
-
-  def gen_line(chan_id, line)
-    chan_id ? "#{chan_id} #{line}" : line
+    chan_id ? "#{chan_id} #{action.line}" : action.line if action.line
   end
 end

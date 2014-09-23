@@ -4,6 +4,7 @@ module MiddleSquid::Handlers
 
     def initialize(callback)
       @callback = callback
+      super
     end
 
     def receive_line(line)

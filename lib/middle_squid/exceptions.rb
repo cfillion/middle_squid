@@ -1,11 +1,11 @@
 class MiddleSquid
-  Error = Class.new Exception
+  Error = Class.new RuntimeError
 
   class Action < Exception
-    attr_reader :type, :params
+    attr_reader :line
 
-    def initialize(type, params)
-      @type, @params = type, params
+    def initialize(line)
+      @line = line
     end
   end
 end
