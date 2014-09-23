@@ -8,4 +8,6 @@ class MiddleSquid
       @line = line
     end
   end
+
+  InvalidURI = Class.new Exception
 end

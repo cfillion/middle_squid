@@ -70,54 +70,6 @@ class TestMain < MiniTest::Test
     end
   end
 
-  def test_action
-    action = assert_raises MiddleSquid::Action do
-      @ms.action 'test'
-    end
-
-    assert_equal 'test', action.line
-  end
-
-  def test_accept
-    action = assert_raises MiddleSquid::Action do
-      @ms.accept
-    end
-
-    assert_equal 'ERR', action.line
-  end
-
-  def test_drop
-    action = assert_raises MiddleSquid::Action do
-      @ms.drop
-    end
-
-    assert_nil action.line
-  end
-
-  def test_redirect_301
-    action = assert_raises MiddleSquid::Action do
-      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk'
-    end
-
-    assert_equal 'OK status=301 url=http://duckduckgo.com/?q=cfillion%20tk', action.line
-  end
-
-  def test_redirect_custom_status
-    action = assert_raises MiddleSquid::Action do
-      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk', status: 418
-    end
-
-    assert_equal 'OK status=418 url=http://duckduckgo.com/?q=cfillion%20tk', action.line
-  end
-
-  def test_replace_by_url
-    action = assert_raises MiddleSquid::Action do
-      @ms.replace_by 'http://duckduckgo.com/?q=cfillion tk'
-    end
-
-    assert_equal 'OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk', action.line
-  end
-
   def test_squid_handler_arguments
     bag = []
 
@@ -192,5 +144,83 @@ class TestMain < MiniTest::Test
     end
 
     assert_equal ['ERR', '0 ERR'], bag
+  end
+
+  def test_squid_handler_invalid_uris
+    MiddleSquid::Config.concurrency = false
+
+    bag = []
+
+    stdout, stderr = capture_io do
+      @ms.instance_eval do
+        @user_callback = proc {}
+
+        bag << squid_handler('')
+        bag << squid_handler('hello world')
+        bag << squid_handler('http:// extra')
+      end
+    end
+
+    assert_equal [nil, nil, nil], bag
+
+    assert_empty stdout
+    assert_equal [
+      "[MiddleSquid] invalid uri received: ''\n",
+      "\tin ''\n",
+
+      "[MiddleSquid] invalid uri received: 'hello'\n",
+      "\tin 'hello world'\n",
+
+      "[MiddleSquid] invalid uri received: 'http://'\n",
+      "\tin 'http:// extra'\n",
+    ], stderr.lines
+  end
+
+  def test_action
+    action = assert_raises MiddleSquid::Action do
+      @ms.action 'test'
+    end
+
+    assert_equal 'test', action.line
+  end
+
+  def test_accept
+    action = assert_raises MiddleSquid::Action do
+      @ms.accept
+    end
+
+    assert_equal 'ERR', action.line
+  end
+
+  def test_drop
+    action = assert_raises MiddleSquid::Action do
+      @ms.drop
+    end
+
+    assert_nil action.line
+  end
+
+  def test_redirect_301
+    action = assert_raises MiddleSquid::Action do
+      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk'
+    end
+
+    assert_equal 'OK status=301 url=http://duckduckgo.com/?q=cfillion%20tk', action.line
+  end
+
+  def test_redirect_custom_status
+    action = assert_raises MiddleSquid::Action do
+      @ms.redirect_to 'http://duckduckgo.com/?q=cfillion tk', status: 418
+    end
+
+    assert_equal 'OK status=418 url=http://duckduckgo.com/?q=cfillion%20tk', action.line
+  end
+
+  def test_replace
+    action = assert_raises MiddleSquid::Action do
+      @ms.replace_by 'http://duckduckgo.com/?q=cfillion tk'
+    end
+
+    assert_equal 'OK rewrite-url=http://duckduckgo.com/?q=cfillion%20tk', action.line
   end
 end

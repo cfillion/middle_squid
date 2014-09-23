@@ -86,11 +86,14 @@ class MiddleSquid
     url, *extras = parts
 
     uri = Addressable::URI.parse url
+    raise InvalidURI if !uri || !uri.host
 
     @user_callback.call uri, extras
 
     accept # default action
   rescue Action => action
     chan_id ? "#{chan_id} #{action.line}" : action.line if action.line
+  rescue InvalidURI, Addressable::URI::InvalidURIError
+    warn "[MiddleSquid] invalid uri received: '#{url}'\n\tin '#{line}'"
   end
 end
