@@ -2,10 +2,10 @@ require File.expand_path '../helper', __FILE__
 
 class TestHandlers < MiniTest::Test
   def test_input
-    called_with = nil
+    bag = []
 
-    input = MiddleSquid::Handlers::Input.new nil, proc {|line|
-      called_with = line
+    input = MiddleSquid::Handlers::Input.new nil, proc {|*args|
+      bag << args
       'return value'
     }
 
@@ -13,7 +13,7 @@ class TestHandlers < MiniTest::Test
       input.receive_line 'hello world'
     end
 
-    assert_equal called_with, 'hello world'
+    assert_equal [['hello world']], bag
     assert_equal "return value\n", stdout
     assert_empty stderr
   end
@@ -29,15 +29,15 @@ class TestHandlers < MiniTest::Test
     assert_empty stderr
   end
 
-  def test_fix_encoding
-    called_with = nil
+  def test_input_fix_encoding
+    bag = []
 
-    input = MiddleSquid::Handlers::Input.new nil, proc {|line| called_with = line }
+    input = MiddleSquid::Handlers::Input.new nil, proc {|line| bag << line }
 
     capture_io do
-      input.receive_line ''.force_encoding(Encoding::ASCII_8BIT)
+      input.receive_line 'hello world'.force_encoding(Encoding::ASCII_8BIT)
     end
 
-    assert_equal Encoding::UTF_8, called_with.encoding
+    assert_equal Encoding::UTF_8, bag[0].encoding
   end
 end

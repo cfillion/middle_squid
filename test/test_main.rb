@@ -42,18 +42,19 @@ class TestMain < MiniTest::Test
   end
 
   def test_config
-    called_with = nil
-    @ms.config {|c| called_with = c }
+    bag = []
+    @ms.config {|*args| bag << args }
 
-    assert_same MiddleSquid::Config, called_with
+    assert_equal [[MiddleSquid::Config]], bag
   end
 
   def test_define_action
-    called = false
-    @ms.define_action(:abc) { called = true }
-    @ms.abc
+    bag = []
 
-    assert called
+    @ms.define_action(:abc) {|*args| bag << args }
+    @ms.abc :hello
+
+    assert_equal [[:hello]], bag
   end
 
   def test_action
