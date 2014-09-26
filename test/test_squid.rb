@@ -94,23 +94,20 @@ class TestSquid < MiniTest::Test
 
     stdout, stderr = capture_io do
       @ms.instance_eval do
-        @user_callback = proc {}
+        @user_callback = proc { @ms.drop }
 
         bag << squid_handler('')
-        bag << squid_handler('hello:world')
         bag << squid_handler('http:// extra')
+        bag << squid_handler('hello:world') # => https
       end
     end
 
-    assert_equal [nil, nil, nil], bag
+    assert_equal [nil, nil, 'ERR'], bag
 
     assert_empty stdout
     assert_equal [
       "[MiddleSquid] invalid uri received: ''\n",
       "\tin ''\n",
-
-      "[MiddleSquid] invalid uri received: 'https://hello:world'\n",
-      "\tin 'hello:world'\n",
 
       "[MiddleSquid] invalid uri received: 'http://'\n",
       "\tin 'http:// extra'\n",

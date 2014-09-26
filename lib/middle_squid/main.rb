@@ -141,7 +141,8 @@ class MiddleSquid
     url, *extras = parts
 
     # squid sends https url in the format "domain:port", without the scheme
-    url = "https://#{url}" if url && !url.include?('://')
+    # FIXME: https support?
+    accept if url && !url.include?('://')
 
     uri = Addressable::URI.parse url
     raise InvalidURI if !uri || !uri.host
