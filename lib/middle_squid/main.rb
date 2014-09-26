@@ -37,6 +37,7 @@ class MiddleSquid
     EM.run {
       EM.open_keyboard Handlers::Input, method(:squid_handler)
 
+      Thin::Logging.logger = Logger.new STDERR
       Thin::Logging.level = Logger::WARN
 
       server = Thin::Server.new SERVER_HOST, 0, method(:http_handler),
