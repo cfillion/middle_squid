@@ -78,21 +78,22 @@ class TestHTTP < MiniTest::Test
     uri = Addressable::URI.parse 'http://test.com/path?query=string'
 
     stub = stub_request(:get, uri).
-      with(:body => 'request body', :headers => {'User-Agent'=>'Mozilla/5.0', 'Chunky' => 'bacon'}).
-      to_return(:status => 200, :body => 'response', :headers => {'Hello' => 'World'})
+      with(:body => 'request%20body', :headers => {'User-Agent'=>'Mozilla/5.0', 'Chunky' => 'bacon', 'Content-Type'=>'test/plain'}).
+      to_return(:status => 200, :body => 'response', :headers => {'CHUNKY_BACON' => 'Hello World'})
 
-    headers, body = download_wrapper uri,
+    status, headers, body = download_wrapper uri,
       'REQUEST_METHOD' => 'GET',
-      'HTTP_USER_AGENT' => 'Mozilla/5.0',
+      'CONTENT_TYPE' => 'test/plain',
       'HTTP_CHUNKY' => 'bacon',
       'HTTP_CONNECTION' => 'ignored',
-      'rack.input' => StringIO.new('request body')
+      'HTTP_USER_AGENT' => 'Mozilla/5.0',
+      'rack.input' => StringIO.new('request%20body')
 
     assert_requested stub
     assert_not_requested :get, uri, :headers => {'Connection' => 'ignored'}
 
-    assert_equal 200, headers.status
-    assert_equal({'HELLO' => 'World', 'CONTENT_LENGTH' => '8'}, headers)
+    assert_equal 200, status
+    assert_equal({'Chunky-Bacon' => 'Hello World'}, headers)
     assert_equal 'response', body
   end
 
@@ -114,12 +115,13 @@ class TestHTTP < MiniTest::Test
 
     stub = stub_request(:get, uri).to_timeout
 
-    headers, body = download_wrapper uri,
+    status, headers, body = download_wrapper uri,
       'REQUEST_METHOD' => 'GET',
       'rack.input' => StringIO.new
 
     assert_requested stub
-    assert_equal 'WebMock timeout error', headers
+    assert_equal 'WebMock timeout error', status
+    assert_nil headers
     assert_nil body
   end
 end
