@@ -12,16 +12,24 @@ class TestSquid < MiniTest::Test
   end
 
   def test_squid_handler_arguments
-    bag = []
+    args_bag = []
+    uri_bag  = []
 
     @ms.instance_eval do
-      @user_callback = proc {|*args| bag << args }
+      uri_bag << @current_uri
+
+      @user_callback = proc {|*args|
+        args_bag << args
+        uri_bag << @current_uri
+      }
 
       MiddleSquid::Config.concurrency = false
       squid_handler SQUID_LINE
 
       MiddleSquid::Config.concurrency = true
       squid_handler CONCURRENT_LINE
+
+      uri_bag << @current_uri
     end
 
     uri = Addressable::URI.parse 'http://cfillion.tk/'
@@ -36,7 +44,14 @@ class TestSquid < MiniTest::Test
     assert_equal [
       [uri, extras],
       [uri, extras],
-    ], bag
+    ], args_bag
+
+    assert_equal [
+      nil,
+      uri,
+      uri,
+      nil,
+    ], uri_bag
   end
 
   def test_squid_handler_output
