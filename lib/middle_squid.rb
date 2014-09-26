@@ -6,6 +6,7 @@ require 'securerandom'
 
 require 'addressable/uri'
 require 'eventmachine'
+require 'em-http-request'
 require 'sqlite3'
 require 'thin'
 require 'thin/async'

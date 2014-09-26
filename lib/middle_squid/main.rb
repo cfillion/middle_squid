@@ -1,6 +1,11 @@
 class MiddleSquid
   PURGE_DELAY = 10
   SERVER_HOST = '127.0.0.1'.freeze
+  IGNORE_HEADERS = [
+    'HTTP_CONNECTION',
+    'HTTP_HOST',
+    'HTTP_VERSION',
+  ].freeze
 
   attr_reader :server_host, :server_port
 
@@ -76,6 +81,29 @@ class MiddleSquid
     }
 
     replace_by "http://#{@server_host}:#{@server_port}/#{token}"
+  end
+
+  def download_like(request, uri)
+    fiber = Fiber.current
+
+    method = request.request_method.downcase.to_sym
+
+    headers = {}
+    request.env.
+      select {|k| k.start_with? 'HTTP_' }.
+      reject {|k| IGNORE_HEADERS.include? k }.
+      each {|key, val| headers[key[5..-1]] = val }
+
+    options = {
+      :body => request.body.read,
+      :head => headers,
+    }
+
+    http = EM::HttpRequest.new(uri.to_s).send method, options
+    http.callback { fiber.resume [http.response_header, http.response] }
+    http.errback { fiber.resume http.error }
+
+    Fiber.yield
   end
 
   def define_action(name, &block)

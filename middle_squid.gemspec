@@ -7,7 +7,7 @@ require 'middle_squid/version'
 Gem::Specification.new do |spec|
   spec.name          = 'middle_squid'
   spec.version       = MiddleSquid::VERSION
-  spec.authors       = ['cfi30']
+  spec.authors       = ['Christian Fillion']
   spec.email         = ['middle_squid@cfillion.tk']
   spec.summary       = 'A redirector, url mangler and webpage interceptor for the squid proxy'
   spec.homepage      = 'https://bitbucket.org/cfi30/middle_squid'
@@ -23,8 +23,10 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'simplecov', '~> 0.9'
   spec.add_development_dependency 'thin-async-test', '~> 1.0'
+  spec.add_development_dependency 'webmock', '~> 1.18'
 
   spec.add_runtime_dependency 'addressable', '~> 2.3'
+  spec.add_runtime_dependency 'em-http-request', '~> 1.1'
   spec.add_runtime_dependency 'eventmachine', '~> 1.0'
   spec.add_runtime_dependency 'sqlite3', '~> 1.3'
   spec.add_runtime_dependency 'thin', '~> 1.6'

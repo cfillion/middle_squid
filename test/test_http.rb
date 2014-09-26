@@ -58,4 +58,68 @@ class TestHTTP < MiniTest::Test
     assert_equal 'World', last_response['HELLO']
     assert_equal 'hello world', last_response.body
   end
+
+  def download_wrapper(uri, env)
+    bag = []
+    req = Rack::Request.new env
+
+    EM.run {
+      Fiber.new {
+        bag << @ms.download_like(req, uri)
+      }.resume
+      EM.next_tick { EM.stop }
+    }
+
+    assert_equal 1, bag.size
+    bag[0]
+  end
+
+  def test_download
+    uri = Addressable::URI.parse 'http://test.com/path?query=string'
+
+    stub = stub_request(:get, uri).
+      with(:body => 'request body', :headers => {'User-Agent'=>'Mozilla/5.0', 'Chunky' => 'bacon'}).
+      to_return(:status => 200, :body => 'response', :headers => {'Hello' => 'World'})
+
+    headers, body = download_wrapper uri,
+      'REQUEST_METHOD' => 'GET',
+      'HTTP_USER_AGENT' => 'Mozilla/5.0',
+      'HTTP_CHUNKY' => 'bacon',
+      'HTTP_CONNECTION' => 'ignored',
+      'rack.input' => StringIO.new('request body')
+
+    assert_requested stub
+    assert_not_requested :get, uri, :headers => {'Connection' => 'ignored'}
+
+    assert_equal 200, headers.status
+    assert_equal({'HELLO' => 'World', 'CONTENT_LENGTH' => '8'}, headers)
+    assert_equal 'response', body
+  end
+
+  def test_download_method
+    uri = Addressable::URI.parse 'http://test.com/'
+
+    stub = stub_request(:post, uri).
+      to_return(:status => 200, :body => '')
+
+    download_wrapper uri,
+      'REQUEST_METHOD' => 'POST',
+      'rack.input' => StringIO.new
+
+    assert_requested stub
+  end
+
+  def test_download_error
+    uri = Addressable::URI.parse 'http://test.com/'
+
+    stub = stub_request(:get, uri).to_timeout
+
+    headers, body = download_wrapper uri,
+      'REQUEST_METHOD' => 'GET',
+      'rack.input' => StringIO.new
+
+    assert_requested stub
+    assert_equal 'WebMock timeout error', headers
+    assert_nil body
+  end
 end

@@ -5,9 +5,10 @@ SimpleCov.start {
   add_filter '/test/'
 }
 
+require 'minitest/autorun'
 require 'rack/test'
 require 'thin/async/test'
-require 'minitest/autorun'
+require 'webmock/minitest'
 
 require 'middle_squid'
 
