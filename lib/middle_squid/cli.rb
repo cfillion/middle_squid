@@ -13,6 +13,8 @@ class MiddleSquid::CLI < Thor
 
     ms = MiddleSquid.new
     ms.eval config_file
+
+    warn '[MiddleSquid] ERROR: The configuration file did not call MiddleSquid#run.' unless ms.ran?
   end
 
   desc 'build SOURCES...', 'populate the database from one or more blacklists'

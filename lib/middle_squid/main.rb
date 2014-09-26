@@ -15,6 +15,7 @@ class MiddleSquid
   def initialize
     @custom_actions = {}
     @tokens = {}
+    @run_was_called = false
   end
 
   def eval(file, inhibit_run: false)
@@ -26,6 +27,10 @@ class MiddleSquid
     @inhibit_run = false
   end
 
+  def ran?
+    @run_was_called
+  end
+
   def config
     yield Config
   end
@@ -35,6 +40,7 @@ class MiddleSquid
 
     BlackList.deadline!
 
+    @run_was_called = true
     @user_callback = callback
 
     EM.run {

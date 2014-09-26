@@ -11,12 +11,15 @@ class TestCLI < MiniTest::Test
 
     assert_match /\Ahello #<MiddleSquid:.+>\Z/, stdout
 
+
     # FIXME: I don't know how to test both cases
     if STDOUT.tty?
-      assert_match /should be launched from squid/i, stderr
+      assert_match /should be launched from squid/, stderr
     else
       assert_empty stderr
     end
+
+    assert_match /The configuration file did not call MiddleSquid#run\./, stderr
   end
 
   def test_exec_relative
