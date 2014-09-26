@@ -7,6 +7,15 @@ module MiddleSquid::Handlers
       super
     end
 
+    alias :buffer_data :receive_data
+    def receive_data(char)
+      if char == "\x00"
+        EM.stop
+      else
+        buffer_data char
+      end
+    end
+
     def receive_line(line)
       # EventMachine sends ASCII-8BIT strings, somehow preventing the databases queries to match
       reply = @callback.call line.force_encoding(Encoding::UTF_8)

@@ -41,6 +41,15 @@ class TestHandlers < MiniTest::Test
     assert_equal Encoding::UTF_8, bag[0].encoding
   end
 
+  def test_input_eof
+    input = MiddleSquid::Handlers::Input.new nil, proc {|line| nil }
+
+    Timeout::timeout 1 do
+      EM.run { input.receive_data "\x00" }
+    end
+  end
+
+
   def test_http_constructor
     MiddleSquid::Handlers::HTTP.new '', 0, []
   end
