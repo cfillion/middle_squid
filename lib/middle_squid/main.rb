@@ -124,7 +124,15 @@ class MiddleSquid
     response = Thin::AsyncResponse.new env
 
     Fiber.new {
-      callback.call request, response
+      retval = callback.call request, response
+
+      if retval.is_a?(Array) && retval.size == 3
+        status, headers, body = retval
+
+        response.status = status
+        response.headers.merge! headers
+        response.write body
+      end
 
       response.done
     }.resume

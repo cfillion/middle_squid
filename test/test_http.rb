@@ -46,4 +46,16 @@ class TestHTTP < MiniTest::Test
 
     refute_same fiber, Fiber.current
   end
+
+  def test_rack_reply
+    register_token_for {
+      [418, {'Hello'=>'World'}, ['hello world']]
+    }
+
+    get '/test'
+
+    assert_equal 418, last_response.status
+    assert_equal 'World', last_response['HELLO']
+    assert_equal 'hello world', last_response.body
+  end
 end
