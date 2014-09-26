@@ -1,7 +1,7 @@
 require File.expand_path '../helper', __FILE__
 
 class TestHandlers < MiniTest::Test
-  def test_input
+  def test_input_line
     bag = []
 
     input = MiddleSquid::Handlers::Input.new nil, proc {|*args|
@@ -49,6 +49,27 @@ class TestHandlers < MiniTest::Test
     end
   end
 
+  def test_input_buffer
+    bag = []
+
+    input = MiddleSquid::Handlers::Input.new nil, proc {|*args| bag << args }
+    capture_io do
+      input.receive_data 'h'
+      input.receive_data 'e'
+      input.receive_data 'l'
+      input.receive_data 'l'
+      input.receive_data 'o'
+      input.receive_data ' '
+      input.receive_data 'w'
+      input.receive_data 'o'
+      input.receive_data 'r'
+      input.receive_data 'l'
+      input.receive_data 'd'
+      input.receive_data "\n"
+    end
+
+    assert_equal [['hello world']], bag
+  end
 
   def test_http_constructor
     MiddleSquid::Handlers::HTTP.new '', 0, []

@@ -1,18 +1,21 @@
 module MiddleSquid::Handlers
   class Input < EventMachine::Connection
-    include EM::Protocols::LineText2
-
     def initialize(callback)
+      @buffer = []
       @callback = callback
+
       super
     end
 
-    alias :buffer_data :receive_data
     def receive_data(char)
-      if char == "\x00"
+      case char
+      when "\x00"
         EM.stop
+      when "\n"
+        receive_line @buffer.join
+        @buffer.clear
       else
-        buffer_data char
+        @buffer << char
       end
     end
 
