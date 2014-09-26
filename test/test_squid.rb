@@ -2,6 +2,7 @@ require File.expand_path '../helper', __FILE__
 
 class TestSquid < MiniTest::Test
   SQUID_LINE = 'http://cfillion.tk/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'.freeze
+  HTTPS_LINE = 'cfillion.tk:443 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'.freeze
   CONCURRENT_LINE = "0 #{SQUID_LINE}".freeze
 
   make_my_diffs_pretty!
@@ -96,7 +97,7 @@ class TestSquid < MiniTest::Test
         @user_callback = proc {}
 
         bag << squid_handler('')
-        bag << squid_handler('hello world')
+        bag << squid_handler('hello:world')
         bag << squid_handler('http:// extra')
       end
     end
@@ -108,8 +109,8 @@ class TestSquid < MiniTest::Test
       "[MiddleSquid] invalid uri received: ''\n",
       "\tin ''\n",
 
-      "[MiddleSquid] invalid uri received: 'hello'\n",
-      "\tin 'hello world'\n",
+      "[MiddleSquid] invalid uri received: 'https://hello:world'\n",
+      "\tin 'hello:world'\n",
 
       "[MiddleSquid] invalid uri received: 'http://'\n",
       "\tin 'http:// extra'\n",

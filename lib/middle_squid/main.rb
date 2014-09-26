@@ -128,6 +128,9 @@ class MiddleSquid
     chan_id = Config.concurrency ? parts.shift : nil
     url, *extras = parts
 
+    # squid sends https url in the format "domain:port", without the scheme
+    url = "https://#{url}" if url && !url.include?('://')
+
     uri = Addressable::URI.parse url
     raise InvalidURI if !uri || !uri.host
 
