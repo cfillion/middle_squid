@@ -19,7 +19,11 @@ module MiddleSquid::Handlers
     def receive_line(line)
       # EventMachine sends ASCII-8BIT strings, somehow preventing the databases queries to match
       reply = @callback.call line.force_encoding(Encoding::UTF_8)
-      puts reply if reply
+
+      if reply
+        puts reply
+        STDOUT.flush
+      end
     end
   end
 
