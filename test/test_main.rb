@@ -122,7 +122,6 @@ class TestMain < MiniTest::Test
     @ms.instance_eval do
       @server_host = '127.0.0.1'
       @server_port = 8901
-      @current_uri = Addressable::URI.parse 'http://cfillion.tk'
     end
 
     action = assert_raises MiddleSquid::Action do
@@ -132,22 +131,6 @@ class TestMain < MiniTest::Test
     end
 
     assert_match /\AOK rewrite-url=http:\/\/127.0.0.1:8901\/[\w-]+\z/, action.line
-  end
-
-  def test_intercept_https
-    @ms.instance_eval do
-      @server_host = '127.0.0.1'
-      @server_port = 8901
-      @current_uri = Addressable::URI.parse 'https://github.com'
-    end
-
-    action = assert_raises MiddleSquid::Action do
-      EM.run {
-        @ms.intercept {}
-      }
-    end
-
-    assert_match /\AOK status=301 url=http:\/\/127.0.0.1:8901\/[\w-]+\z/, action.line
   end
 
   def test_intercept_requires_a_block

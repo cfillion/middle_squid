@@ -84,13 +84,7 @@ class MiddleSquid
       @tokens.delete token
     }
 
-    tailored_url = "http://#{@server_host}:#{@server_port}/#{token}"
-
-    if @current_uri.scheme == 'http'
-      replace_by tailored_url
-    else
-      redirect_to tailored_url
-    end
+    replace_by "http://#{@server_host}:#{@server_port}/#{token}"
   end
 
   def download_like(request, uri)
@@ -152,7 +146,6 @@ class MiddleSquid
     uri = Addressable::URI.parse url
     raise InvalidURI if !uri || !uri.host
 
-    @current_uri = uri
     @user_callback.call uri, extras
 
     accept # default action
@@ -160,8 +153,6 @@ class MiddleSquid
     chan_id ? "#{chan_id} #{action.line}" : action.line if action.line
   rescue InvalidURI, Addressable::URI::InvalidURIError
     warn "[MiddleSquid] invalid uri received: '#{url}'\n\tin '#{line}'"
-  ensure
-    @current_uri = nil
   end
 
   def http_handler(env)
