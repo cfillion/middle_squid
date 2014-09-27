@@ -351,4 +351,30 @@ class TestDatabase < MiniTest::Test
     assert_match 'found 3 ignored expression(s)', stdout
     assert_match 'WARNING: nothing to commit', stderr
   end
+
+  def test_aliases
+    MiddleSquid::Config.minimal_indexing = true
+    MiddleSquid::BlackList.new 'cat_name', aliases: ['adv']
+
+    stdout, stderr = capture_io do
+      MiddleSquid::Database.build File.join(@path, 'black')
+    end
+
+    refute has_test_data?
+
+    domains = db.execute 'SELECT category, host FROM domains'
+    assert_equal [
+      ['cat_name', '.ads.google.com'],
+      ['cat_name', '.doubleclick.net'],
+    ], domains
+
+    urls = db.execute 'SELECT category, host, path FROM urls'
+    assert_equal [
+      ['cat_name', '.google.com', 'adsense'],
+    ], urls
+
+    refute_match 'tracker', stdout
+    assert_match 'indexed 1 categorie(s): ["cat_name"]', stdout
+    assert_empty stderr
+  end
 end

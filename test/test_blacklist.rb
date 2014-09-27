@@ -39,6 +39,16 @@ class TestBlackList < MiniTest::Test
     assert_equal 'cat_name', bl.category
   end
 
+  def test_aliases_default
+    bl = MiddleSquid::BlackList.new 'cat_name'
+    assert_equal [], bl.aliases
+  end
+
+  def test_aliases_custom
+    bl = MiddleSquid::BlackList.new 'cat_name', aliases: ['name_cat']
+    assert_equal ['name_cat'], bl.aliases
+  end
+
   def test_instances
     MiddleSquid::BlackList.class_eval '@@instances = []'
 

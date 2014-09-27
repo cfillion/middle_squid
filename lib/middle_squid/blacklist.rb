@@ -8,14 +8,17 @@ class MiddleSquid::BlackList
   def self.deadline!; @@too_late = true; end
 
   attr_reader :category
+  attr_reader :aliases
 
-  def initialize(category)
+  def initialize(category, aliases: [])
     if @@too_late
       raise MiddleSquid::Error,
         'blacklists cannot be initialized inside the squid helper'
     end
 
     @category = category
+    @aliases = aliases
+
     @@instances << self
   end
 

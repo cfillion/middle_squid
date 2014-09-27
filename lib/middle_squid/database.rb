@@ -39,10 +39,20 @@ module MiddleSquid::Database
     start_time = Time.now
     indexed_cats = []
 
-    used_cats = MiddleSquid::BlackList.instances.map {|bl| bl.category }
-    used_cats.uniq!
+    cats_in_use = []
+    aliases = {}
 
-    if used_cats.empty? && MiddleSquid::Config.minimal_indexing
+    MiddleSquid::BlackList.instances.each {|bl|
+      cats_in_use << bl.category
+
+      bl.aliases.each {|name|
+        aliases[name] = bl.category
+      }
+    }
+
+    cats_in_use.uniq!
+
+    if cats_in_use.empty? && MiddleSquid::Config.minimal_indexing
       warn 'ERROR: the loaded configuration does not use any blacklist'
       puts 'nothing to do in minimal indexing mode'
       return
@@ -75,9 +85,10 @@ module MiddleSquid::Database
         next unless pn.file?
 
         category = pn.dirname.basename.to_s
+        category = aliases[category] if aliases.has_key? category
 
         if MiddleSquid::Config.minimal_indexing
-          next unless used_cats.include? category
+          next unless cats_in_use.include? category
         end
 
         indexed_cats << category
@@ -101,7 +112,7 @@ module MiddleSquid::Database
     end
 
     indexed_cats.uniq!
-    missing_cats = used_cats - indexed_cats
+    missing_cats = cats_in_use - indexed_cats
 
     puts
     puts "indexed #{indexed_cats.size} categorie(s): #{indexed_cats}"
