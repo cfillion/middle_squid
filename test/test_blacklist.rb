@@ -4,11 +4,11 @@ class TestBlackList < MiniTest::Test
   include MiddleSquid::Database
 
   DOMAINS = %w{
-    cfillion.tk duckduckgo.com stackoverflow.com analytics.google.com anidb.net
+    .cfillion.tk .duckduckgo.com .sub.stackoverflow.com .analytics.google.com .anidb.net
   }
 
   URLS = [
-    %w[google.com analytics], %w[youtube.com watch], %w[github.com user]
+    %w[.google.com analytics], %w[.youtube.com watch], %w[.github.com user]
   ]
 
   def setup
@@ -68,14 +68,6 @@ class TestBlackList < MiniTest::Test
     assert even.include? uri
   end
 
-  def test_domain_www
-    uri = Addressable::URI.parse('http://www.anidb.net/')
-    even = MiddleSquid::BlackList.new 'even'
-
-    assert even.include_domain? uri
-    assert even.include? uri
-  end
-
   def test_domain_trailing_dots
     uri = Addressable::URI.parse('http://cfillion.tk...')
     even = MiddleSquid::BlackList.new 'even'
@@ -85,15 +77,35 @@ class TestBlackList < MiniTest::Test
   end
 
   def test_domain_partial_match
+    uri1 = Addressable::URI.parse('http://www.anidb.net/')
+    uri2 = Addressable::URI.parse('http://abcde.anidb.net/')
+    uri3 = Addressable::URI.parse('http://bus.sub.stackoverflow.com/')
+    even = MiddleSquid::BlackList.new 'even'
+
+    assert even.include_domain?(uri1), 'www'
+    assert even.include? uri1
+
+    assert even.include_domain?(uri2), 'any subdomain'
+    assert even.include? uri2
+
+    assert even.include_domain?(uri3), 'sub-sub-domain'
+    assert even.include? uri3
+  end
+
+  def test_domain_partial_unmatch
     uri1 = Addressable::URI.parse('http://google.com')
     uri2 = Addressable::URI.parse('http://duckduckgo/')
+    uri3 = Addressable::URI.parse('http://fakeanalytics.google.com/')
     odd = MiddleSquid::BlackList.new 'odd'
 
-    refute odd.include_domain? uri1
+    refute odd.include_domain?(uri1), 'right match'
     refute odd.include? uri1
 
-    refute odd.include_domain? uri2
+    refute odd.include_domain?(uri2), 'left match'
     refute odd.include? uri2
+
+    refute odd.include_domain?(uri3), 'partial subdomain match'
+    refute odd.include? uri3
   end
 
   def test_url
@@ -105,13 +117,6 @@ class TestBlackList < MiniTest::Test
     assert even.include? uri
   end
 
-  def test_url_www
-    uri = Addressable::URI.parse('http://www.google.com/analytics')
-    even = MiddleSquid::BlackList.new 'even'
-
-    assert even.include_url? uri
-    assert even.include? uri
-  end
 
   def test_url_tailing_dots
     uri = Addressable::URI.parse('http://www.google.com.../analytics')
@@ -121,12 +126,31 @@ class TestBlackList < MiniTest::Test
     assert even.include? uri
   end
 
-  def test_url_partial_domain
-    uri = Addressable::URI.parse('http://youtube/watch')
+  def test_url_partial_domain_match
+    uri1 = Addressable::URI.parse('http://www.google.com/analytics/')
+    uri2 = Addressable::URI.parse('http://test.google.com/analytics/')
+    uri3 = Addressable::URI.parse('http://bus.test.google.com/analytics')
+    even = MiddleSquid::BlackList.new 'even'
+
+    assert even.include_url?(uri1), 'www'
+    assert even.include? uri1
+
+    assert even.include_url?(uri2), 'any subdomain'
+    assert even.include? uri2
+
+    assert even.include_url?(uri3), 'sub-sub-domain'
+  end
+
+  def test_url_partial_domain_unmatch
+    uri1 = Addressable::URI.parse('http://tube.com/watch')
+    uri2 = Addressable::URI.parse('http://youtube/watch')
     odd = MiddleSquid::BlackList.new 'odd'
 
-    refute odd.include_url? uri
-    refute odd.include? uri
+    refute odd.include_url?(uri1), 'right match'
+    refute odd.include? uri1
+
+    refute odd.include_url?(uri2), 'left match'
+    refute odd.include? uri2
   end
 
   def test_url_longer_path

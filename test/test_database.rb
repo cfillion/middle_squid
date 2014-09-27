@@ -14,10 +14,10 @@ class TestDatabase < MiniTest::Test
     db.execute 'DELETE FROM urls' 
 
     db.execute 'INSERT INTO domains (category, host) VALUES (?, ?)',
-      ['test', 'anidb.net']
+      ['test', '.anidb.net']
 
     db.execute 'INSERT INTO urls (category, host, path) VALUES (?, ?, ?)',
-      ['test', 'test.com', '/path']
+      ['test', '.test.com', 'path']
 
     db.commit
   end
@@ -28,11 +28,11 @@ class TestDatabase < MiniTest::Test
 
   def has_test_data?
     has_domain = !!db.get_first_row(
-      "SELECT 1 FROM domains WHERE category = 'test' AND host = 'anidb.net' AND rowid = 1 LIMIT 1"
+      "SELECT 1 FROM domains WHERE category = 'test' AND host = '.anidb.net' AND rowid = 1 LIMIT 1"
     )
 
     has_url = !!db.get_first_row(
-      "SELECT 1 FROM urls WHERE category = 'test' AND host = 'test.com' AND path = '/path' AND rowid = 1 LIMIT 1"
+      "SELECT 1 FROM urls WHERE category = 'test' AND host = '.test.com' AND path = 'path' AND rowid = 1 LIMIT 1"
     )
 
     has_domain || has_url
@@ -91,17 +91,17 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', 'ads.google.com'],
-      ['adv', 'doubleclick.net'],
-      ['tracker', 'xiti.com'],
-      ['tracker', 'google-analytics.com'],
+      ['adv', '.ads.google.com'],
+      ['adv', '.doubleclick.net'],
+      ['tracker', '.xiti.com'],
+      ['tracker', '.google-analytics.com'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', 'google.com', 'adsense'],
-      ['tracker', 'feedproxy.google.com', '~r'],
-      ['tracker', 'cloudfront-labs.amazonaws.com', 'x.png'],
+      ['adv', '.google.com', 'adsense'],
+      ['tracker', '.feedproxy.google.com', '~r'],
+      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
     ], urls
 
     assert_match 'indexing adv/urls', stdout
@@ -130,22 +130,22 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', 'ads.google.com'],
-      ['adv', 'doubleclick.net'],
-      ['tracker', 'xiti.com'],
-      ['tracker', 'google-analytics.com'],
-      ['isp', '000webhost.com'],
-      ['isp', 'comcast.com'],
-      ['news', 'reddit.com'],
-      ['news', 'news.ycombinator.com'],
+      ['adv', '.ads.google.com'],
+      ['adv', '.doubleclick.net'],
+      ['tracker', '.xiti.com'],
+      ['tracker', '.google-analytics.com'],
+      ['isp', '.000webhost.com'],
+      ['isp', '.comcast.com'],
+      ['news', '.reddit.com'],
+      ['news', '.news.ycombinator.com'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', 'google.com', 'adsense'],
-      ['tracker', 'feedproxy.google.com', '~r'],
-      ['tracker', 'cloudfront-labs.amazonaws.com', 'x.png'],
-      ['isp', 'telus.com', 'content/internet'],
+      ['adv', '.google.com', 'adsense'],
+      ['tracker', '.feedproxy.google.com', '~r'],
+      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
+      ['isp', '.telus.com', 'content/internet'],
     ], urls
 
     assert_match 'indexed 4 categorie(s): ["adv", "tracker", "isp", "news"]', stdout
@@ -179,13 +179,13 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', 'ads.google.com'],
-      ['adv', 'doubleclick.net'],
+      ['adv', '.ads.google.com'],
+      ['adv', '.doubleclick.net'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', 'google.com', 'adsense'],
+      ['adv', '.google.com', 'adsense'],
     ], urls
 
     refute_match 'tracker', stdout
@@ -234,12 +234,12 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['cat', 'domain.com'],
+      ['cat', '.domain.com'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'url.com', 'path'],
+      ['cat', '.url.com', 'path'],
     ], urls
   end
 
@@ -257,7 +257,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'google.com', 'path/to/file'],
+      ['cat', '.google.com', 'path/to/file'],
     ], urls
   end
 
@@ -275,7 +275,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'host.com', 'path_with__invalid_byte'],
+      ['cat', '.host.com', 'path_with__invalid_byte'],
     ], urls
   end
 
@@ -290,7 +290,7 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['cat', 'host.com'],
+      ['cat', '.host.com'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
@@ -310,14 +310,14 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['cat', 'host.com'],
-      ['copy_of_cat', 'host.com'],
+      ['cat', '.host.com'],
+      ['copy_of_cat', '.host.com'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', 'host.com', 'path'],
-      ['copy_of_cat', 'host.com', 'path'],
+      ['cat', '.host.com', 'path'],
+      ['copy_of_cat', '.host.com', 'path'],
     ], urls
 
     assert_match 'found 12 duplicate(s)', stdout

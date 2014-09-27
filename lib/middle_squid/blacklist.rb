@@ -21,14 +21,14 @@ class MiddleSquid::BlackList
 
   def include_domain?(uri)
     !!db.get_first_value(
-      'SELECT 1 FROM domains WHERE category = ? AND host = ? LIMIT 1',
+      "SELECT 1 FROM domains WHERE category = ? AND ? LIKE '%' || host LIMIT 1",
       [@category, uri.cleanhost]
     )
   end
 
   def include_url?(uri)
     !!db.get_first_value(
-      "SELECT 1 FROM urls WHERE category = ? AND host = ? AND ? LIKE path || '%' LIMIT 1",
+      "SELECT 1 FROM urls WHERE category = ? AND ? LIKE '%' || host AND ? LIKE path || '%' LIMIT 1",
       [@category, uri.cleanhost, uri.cleanpath]
     )
   end

@@ -1,5 +1,8 @@
 class Addressable::URI
+  DOT = '.'.freeze
+
   def cleanhost
+    DOT +
     normalized_host \
       .sub(/\Awww\./, '')
       .sub(/\.+\z/, '')

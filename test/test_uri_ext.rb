@@ -2,25 +2,28 @@ require File.expand_path '../helper', __FILE__
 
 class TestUriExt < MiniTest::Test
   def test_cleanhost
-    assert_equal 'cfillion.tk',
+    assert_equal '.cfillion.tk',
+      Addressable::URI.parse('http://cfillion.tk/').cleanhost
+
+    assert_equal '.cfillion.tk',
       Addressable::URI.parse('http://www.cfillion.tk/').cleanhost
 
-    assert_equal 'sub.cfillion.tk',
+    assert_equal '.sub.cfillion.tk',
       Addressable::URI.parse('http://sub.cfillion.tk/').cleanhost
   end
 
   def test_cleanhost_trailing_dots
-    assert_equal 'cfillion.tk',
+    assert_equal '.cfillion.tk',
       Addressable::URI.parse('http://cfillion.tk./').cleanhost
 
-    assert_equal 'cfillion.tk',
+    assert_equal '.cfillion.tk',
       Addressable::URI.parse('http://cfillion.tk../').cleanhost
   end
 
   def test_cleanhost_normalized
     cleanhost = Addressable::URI.parse('http://éacute.com').cleanhost
 
-    assert_equal 'xn--acute-9ra.com', cleanhost
+    assert_equal '.xn--acute-9ra.com', cleanhost
     assert_equal Encoding::UTF_8, cleanhost.encoding
   end
 
