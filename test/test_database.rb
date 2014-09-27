@@ -57,7 +57,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = true
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/black'
+      MiddleSquid::Database.build File.join(@path, 'black')
     end
 
     assert_equal "nothing to do in minimal indexing mode\n", stdout
@@ -70,7 +70,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/empty'
+      MiddleSquid::Database.build File.join(@path, 'empty')
     end
 
     assert_match 'indexing category/emptylist', stdout
@@ -84,7 +84,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/black'
+      MiddleSquid::Database.build File.join(@path, 'black')
     end
 
     refute has_test_data?
@@ -112,6 +112,7 @@ class TestDatabase < MiniTest::Test
     assert_match 'found 4 domain(s)', stdout
     assert_match 'found 3 url(s)', stdout
     assert_match 'found 0 duplicate(s)', stdout
+    assert_match 'found 0 ignored expression(s)', stdout
     assert_match 'committing changes', stdout
 
     assert_empty stderr
@@ -121,7 +122,8 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/black', @path + '/gray'
+      MiddleSquid::Database.build \
+        File.join(@path, 'black'), File.join(@path, 'gray')
     end
 
     refute has_test_data?
@@ -158,7 +160,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/subdirectory'
+      MiddleSquid::Database.build File.join(@path, 'subdirectory')
     end
 
     refute_match 'cat/ignore', stdout
@@ -170,7 +172,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::BlackList.new 'adv'
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/black'
+      MiddleSquid::Database.build File.join(@path, 'black')
     end
 
     refute has_test_data?
@@ -195,13 +197,13 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/404'
+      MiddleSquid::Database.build File.join(@path, '404')
     end
 
     assert has_test_data?
 
-    assert_match "reading #{@path + '/404'}", stdout
-    assert_match "WARNING: #{@path + '/404'}: no such directory\n", stderr
+    assert_match "reading #{File.join @path, '404'}", stdout
+    assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
     assert_match "WARNING: nothing to commit", stderr
   end
 
@@ -209,21 +211,23 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/404', @path + '/gray'
+      MiddleSquid::Database.build \
+        File.join(@path, '404'),
+        File.join(@path, 'gray')
     end
 
     refute has_test_data?
 
-    assert_match "reading #{@path + '/404'}", stdout
-    assert_match "WARNING: #{@path + '/404'}: no such directory\n", stderr
-    assert_match "reading #{@path + '/gray'}", stdout
+    assert_match "reading #{File.join @path, '404'}", stdout
+    assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
+    assert_match "reading #{File.join @path, 'gray'}", stdout
   end
 
   def test_mixed
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/mixed'
+      MiddleSquid::Database.build File.join(@path, 'mixed')
     end
 
     refute has_test_data?
@@ -243,7 +247,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/backslash'
+      MiddleSquid::Database.build File.join(@path, 'backslash')
     end
 
     refute has_test_data?
@@ -261,7 +265,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/invalid_byte'
+      MiddleSquid::Database.build File.join(@path, 'invalid_byte')
     end
 
     refute has_test_data?
@@ -279,7 +283,7 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/normalize'
+      MiddleSquid::Database.build File.join(@path, 'normalize')
     end
 
     refute has_test_data?
@@ -297,7 +301,9 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/duplicates', @path + '/copy_of_duplicates'
+      MiddleSquid::Database.build \
+        File.join(@path, 'duplicates'),
+        File.join(@path, 'copy_of_duplicates')
     end
 
     refute has_test_data?
@@ -315,6 +321,7 @@ class TestDatabase < MiniTest::Test
     ], urls
 
     assert_match 'found 12 duplicate(s)', stdout
+    assert_match 'found 0 ignored expression(s)', stdout
     assert_empty stderr
   end
 
@@ -324,11 +331,24 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::BlackList.new '404' # should not cause duplicate output
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build @path + '/black'
+      MiddleSquid::Database.build File.join(@path, 'black')
     end
 
     refute has_test_data?
 
     assert_match 'WARNING: could not find ["404"]', stderr
+  end
+
+  def test_expressions
+    MiddleSquid::Config.minimal_indexing = false
+
+    stdout, stderr = capture_io do
+      MiddleSquid::Database.build File.join(@path, 'expressions')
+    end
+
+    assert has_test_data?
+
+    assert_match 'found 3 ignored expression(s)', stdout
+    assert_match 'WARNING: nothing to commit', stderr
   end
 end

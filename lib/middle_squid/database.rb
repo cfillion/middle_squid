@@ -49,8 +49,9 @@ module MiddleSquid::Database
     end
 
     total = {
+      :url    => 0,
       :domain  => 0,
-      :url      => 0,
+      :ignored  => 0,
       :duplicate => 0,
     }
 
@@ -109,6 +110,7 @@ module MiddleSquid::Database
     puts "found #{total[:domain]} domain(s)"
     puts "found #{total[:url]} url(s)"
     puts "found #{total[:duplicate]} duplicate(s)"
+    puts "found #{total[:ignored]} ignored expression(s)"
     puts
 
     end_time = Time.now
@@ -116,6 +118,8 @@ module MiddleSquid::Database
   end
 
   def self.append_to(category, line)
+    return :ignored unless line[0] =~ /\w/
+
     line.encode! Encoding::UTF_8,
       invalid: :replace, undef: :replace, replace: ''
 

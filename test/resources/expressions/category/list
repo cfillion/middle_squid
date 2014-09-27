@@ -1,0 +1,3 @@
+(/ads/|/ad/|/banner/|/sponsor/|/event.ng/|/Advertisement/|adverts/)
+[0-9]
+^[0-9]+
