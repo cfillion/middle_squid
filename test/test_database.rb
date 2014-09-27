@@ -223,7 +223,7 @@ class TestDatabase < MiniTest::Test
     assert_match "reading #{File.join @path, 'gray'}", stdout
   end
 
-  def test_mixed
+  def test_mixed_content
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
@@ -279,11 +279,11 @@ class TestDatabase < MiniTest::Test
     ], urls
   end
 
-  def test_normalize
+  def test_empty_path_as_domain
     MiddleSquid::Config.minimal_indexing = false
 
     stdout, stderr = capture_io do
-      MiddleSquid::Database.build File.join(@path, 'normalize')
+      MiddleSquid::Database.build File.join(@path, 'empty_path')
     end
 
     refute has_test_data?
