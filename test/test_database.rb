@@ -92,24 +92,24 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', '.ads.google.com'],
-      ['adv', '.doubleclick.net'],
+      ['ads', '.ads.google.com'],
+      ['ads', '.doubleclick.net'],
       ['tracker', '.xiti.com'],
       ['tracker', '.google-analytics.com'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', '.google.com', 'adsense'],
+      ['ads', '.google.com', 'adsense'],
       ['tracker', '.feedproxy.google.com', '~r'],
       ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
     ], urls
 
-    assert_match 'indexing adv/urls', stdout
-    assert_match 'indexing adv/domains', stdout
+    assert_match 'indexing ads/urls', stdout
+    assert_match 'indexing ads/domains', stdout
     assert_match 'indexing tracker/urls', stdout
     assert_match 'indexing tracker/domains', stdout
-    assert_match 'indexed 2 categorie(s): ["adv", "tracker"]', stdout
+    assert_match 'indexed 2 categorie(s): ["ads", "tracker"]', stdout
     assert_match 'found 4 domain(s)', stdout
     assert_match 'found 3 url(s)', stdout
     assert_match 'found 0 duplicate(s)', stdout
@@ -129,8 +129,8 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', '.ads.google.com'],
-      ['adv', '.doubleclick.net'],
+      ['ads', '.ads.google.com'],
+      ['ads', '.doubleclick.net'],
       ['tracker', '.xiti.com'],
       ['tracker', '.google-analytics.com'],
       ['isp', '.000webhost.com'],
@@ -141,13 +141,13 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', '.google.com', 'adsense'],
+      ['ads', '.google.com', 'adsense'],
       ['tracker', '.feedproxy.google.com', '~r'],
       ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
       ['isp', '.telus.com', 'content/internet'],
     ], urls
 
-    assert_match 'indexed 4 categorie(s): ["adv", "tracker", "isp", "news"]', stdout
+    assert_match 'indexed 4 categorie(s): ["ads", "tracker", "isp", "news"]', stdout
     assert_match 'found 8 domain(s)', stdout
     assert_match 'found 4 url(s)', stdout
     assert_match 'found 0 duplicate(s)', stdout
@@ -166,7 +166,7 @@ class TestDatabase < MiniTest::Test
 
   def test_minimal_indexing
     MiddleSquid::Config.minimal_indexing = true
-    MiddleSquid::BlackList.new 'adv'
+    MiddleSquid::BlackList.new 'ads'
 
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'black')
@@ -176,17 +176,17 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', '.ads.google.com'],
-      ['adv', '.doubleclick.net'],
+      ['ads', '.ads.google.com'],
+      ['ads', '.doubleclick.net'],
     ], domains
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', '.google.com', 'adsense'],
+      ['ads', '.google.com', 'adsense'],
     ], urls
 
     refute_match 'tracker', stdout
-    assert_match 'indexed 1 categorie(s): ["adv"]', stdout
+    assert_match 'indexed 1 categorie(s): ["ads"]', stdout
 
     assert_empty stderr
   end
@@ -338,7 +338,7 @@ class TestDatabase < MiniTest::Test
 
   def test_aliases
     MiddleSquid::Config.minimal_indexing = true
-    MiddleSquid::BlackList.new 'cat_name', aliases: ['adv']
+    MiddleSquid::BlackList.new 'cat_name', aliases: ['ads']
 
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'black')
@@ -374,8 +374,8 @@ class TestDatabase < MiniTest::Test
 
     domains = db.execute 'SELECT category, host FROM domains'
     assert_equal [
-      ['adv', '.ads.google.com'],
-      ['adv', '.doubleclick.net'],
+      ['ads', '.ads.google.com'],
+      ['ads', '.doubleclick.net'],
       ['tracker', '.xiti.com'],
       ['tracker', '.google-analytics.com'],
     ], domains
@@ -404,7 +404,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['adv', '.google.com', 'adsense'],
+      ['ads', '.google.com', 'adsense'],
       ['tracker', '.feedproxy.google.com', '~r'],
       ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
     ], urls
