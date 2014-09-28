@@ -129,21 +129,31 @@ module MiddleSquid::Database
   end
 
   def self.append_to(category, line)
+    entries = MiddleSquid::Config.index_entries
+
+    # ignore regex lists
     return :ignored unless line[0] =~ /\w/
 
+    # strip invalid bytes
     line.encode! Encoding::UTF_8,
       invalid: :replace, undef: :replace, replace: ''
 
+    # fix for dirty lists
     line.tr! '\\', '/'
 
     uri = Addressable::URI.parse "http://#{line}"
     host, path = uri.cleanhost, uri.cleanpath
 
     if path.empty?
+      return :ignored unless entries.include? :domain
+
       @@db.execute 'INSERT INTO domains (category, host) VALUES (?, ?)',
         [category, host]
+
       :domain
     else
+      return :ignored unless entries.include? :url
+
       @@db.execute 'INSERT INTO urls (category, host, path) VALUES (?, ?, ?)',
         [category, host, path]
       :url

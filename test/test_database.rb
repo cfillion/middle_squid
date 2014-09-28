@@ -20,6 +20,9 @@ class TestDatabase < MiniTest::Test
       ['test', '.test.com', 'path']
 
     db.commit
+
+    MiddleSquid::Config.minimal_indexing = false
+    MiddleSquid::Config.index_entries = [:domain, :url]
   end
 
   def teardown
@@ -61,28 +64,26 @@ class TestDatabase < MiniTest::Test
     end
 
     assert_equal "nothing to do in minimal indexing mode\n", stdout
+
     assert_match 'ERROR', stderr
 
     assert has_test_data?
   end
 
   def test_empty_rollback
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'empty')
     end
 
     assert_match 'indexing category/emptylist', stdout
     assert_match 'reverting changes', stdout
+
     assert_match 'WARNING: nothing to commit', stderr
 
     assert has_test_data?
   end
 
   def test_index
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'black')
     end
@@ -119,8 +120,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_index_multiple
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build \
         File.join(@path, 'black'), File.join(@path, 'gray')
@@ -157,8 +156,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_ignore_subdirectories
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'subdirectory')
     end
@@ -190,12 +187,11 @@ class TestDatabase < MiniTest::Test
 
     refute_match 'tracker', stdout
     assert_match 'indexed 1 categorie(s): ["adv"]', stdout
+
     assert_empty stderr
   end
 
   def test_not_found
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, '404')
     end
@@ -203,13 +199,12 @@ class TestDatabase < MiniTest::Test
     assert has_test_data?
 
     assert_match "reading #{File.join @path, '404'}", stdout
+
     assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
     assert_match "WARNING: nothing to commit", stderr
   end
 
   def test_multiple_not_found
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build \
         File.join(@path, '404'),
@@ -219,13 +214,12 @@ class TestDatabase < MiniTest::Test
     refute has_test_data?
 
     assert_match "reading #{File.join @path, '404'}", stdout
-    assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
     assert_match "reading #{File.join @path, 'gray'}", stdout
+
+    assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
   end
 
   def test_mixed_content
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'mixed')
     end
@@ -244,8 +238,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_backslash
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'backslash')
     end
@@ -262,8 +254,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_invalid_byte
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'invalid_byte')
     end
@@ -280,8 +270,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_empty_path_as_domain
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'empty_path')
     end
@@ -298,8 +286,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_duplicates
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build \
         File.join(@path, 'duplicates'),
@@ -322,11 +308,11 @@ class TestDatabase < MiniTest::Test
 
     assert_match 'found 12 duplicate(s)', stdout
     assert_match 'found 0 ignored expression(s)', stdout
+
     assert_empty stderr
   end
 
   def test_missing_category
-    MiddleSquid::Config.minimal_indexing = false
     MiddleSquid::BlackList.new '404'
     MiddleSquid::BlackList.new '404' # should not cause duplicate output
 
@@ -340,8 +326,6 @@ class TestDatabase < MiniTest::Test
   end
 
   def test_expressions
-    MiddleSquid::Config.minimal_indexing = false
-
     stdout, stderr = capture_io do
       MiddleSquid::Database.build File.join(@path, 'expressions')
     end
@@ -375,6 +359,60 @@ class TestDatabase < MiniTest::Test
 
     refute_match 'tracker', stdout
     assert_match 'indexed 1 categorie(s): ["cat_name"]', stdout
+
+    assert_empty stderr
+  end
+
+  def test_domains_only
+    MiddleSquid::Config.index_entries = [:domain]
+
+    stdout, stderr = capture_io do
+      MiddleSquid::Database.build File.join(@path, 'black')
+    end
+
+    refute has_test_data?
+
+    domains = db.execute 'SELECT category, host FROM domains'
+    assert_equal [
+      ['adv', '.ads.google.com'],
+      ['adv', '.doubleclick.net'],
+      ['tracker', '.xiti.com'],
+      ['tracker', '.google-analytics.com'],
+    ], domains
+
+    urls = db.execute 'SELECT category, host, path FROM urls'
+    assert_empty urls
+
+    assert_match 'found 4 domain(s)', stdout
+    assert_match 'found 0 url(s)', stdout
+    assert_match 'found 3 ignored expression(s)', stdout
+
+    assert_empty stderr
+  end
+
+  def test_urls_only
+    MiddleSquid::Config.index_entries = [:url]
+
+    stdout, stderr = capture_io do
+      MiddleSquid::Database.build File.join(@path, 'black')
+    end
+
+    refute has_test_data?
+
+    domains = db.execute 'SELECT category, host FROM domains'
+    assert_empty domains
+
+    urls = db.execute 'SELECT category, host, path FROM urls'
+    assert_equal [
+      ['adv', '.google.com', 'adsense'],
+      ['tracker', '.feedproxy.google.com', '~r'],
+      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
+    ], urls
+
+    assert_match 'found 0 domain(s)', stdout
+    assert_match 'found 3 url(s)', stdout
+    assert_match 'found 4 ignored expression(s)', stdout
+
     assert_empty stderr
   end
 end
