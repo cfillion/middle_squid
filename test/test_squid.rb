@@ -24,7 +24,7 @@ class TestSquid < MiniTest::Test
       squid_handler CONCURRENT_LINE
     end
 
-    uri = Addressable::URI.parse 'http://cfillion.tk/'
+    uri = MiddleSquid::URI.parse 'http://cfillion.tk/'
     extras = [
       '127.0.0.1/localhost.localdomain',
       '-',

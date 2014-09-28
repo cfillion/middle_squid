@@ -150,7 +150,7 @@ class MiddleSquid
     # FIXME: https support?
     accept if url && !url.include?('://')
 
-    uri = Addressable::URI.parse url
+    uri = URI.parse url
     raise InvalidURI if !uri || !uri.host
 
     @user_callback.call uri, extras

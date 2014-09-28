@@ -75,7 +75,7 @@ class TestHTTP < MiniTest::Test
   end
 
   def test_download
-    uri = Addressable::URI.parse 'http://test.com/path?query=string'
+    uri = MiddleSquid::URI.parse 'http://test.com/path?query=string'
 
     stub = stub_request(:get, uri).
       with(:body => 'request%20body', :headers => {'User-Agent'=>'Mozilla/5.0', 'Chunky' => 'bacon', 'Content-Type'=>'test/plain'}).
@@ -98,7 +98,7 @@ class TestHTTP < MiniTest::Test
   end
 
   def test_download_method
-    uri = Addressable::URI.parse 'http://test.com/'
+    uri = MiddleSquid::URI.parse 'http://test.com/'
 
     stub = stub_request(:post, uri).
       to_return(:status => 200, :body => '')
@@ -111,7 +111,7 @@ class TestHTTP < MiniTest::Test
   end
 
   def test_download_error
-    uri = Addressable::URI.parse 'http://test.com/'
+    uri = MiddleSquid::URI.parse 'http://test.com/'
 
     stub = stub_request(:get, uri).to_timeout
 

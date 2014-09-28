@@ -35,7 +35,7 @@ class TestDatabase < MiniTest::Test
     )
 
     has_url = !!db.get_first_row(
-      "SELECT 1 FROM urls WHERE category = 'test' AND host = '.test.com' AND path = 'path' AND rowid = 1 LIMIT 1"
+      "SELECT 1 FROM urls WHERE category = 'test' AND host = '.test.com' AND path = 'path/' AND rowid = 1 LIMIT 1"
     )
 
     has_domain || has_url
@@ -100,9 +100,9 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['ads', '.google.com', 'adsense'],
-      ['tracker', '.feedproxy.google.com', '~r'],
-      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
+      ['ads', '.google.com', 'adsense/'],
+      ['tracker', '.feedproxy.google.com', '~r/'],
+      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png/'],
     ], urls
 
     assert_match 'indexing ads/urls', stdout
@@ -141,10 +141,10 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['ads', '.google.com', 'adsense'],
-      ['tracker', '.feedproxy.google.com', '~r'],
-      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
-      ['isp', '.telus.com', 'content/internet'],
+      ['ads', '.google.com', 'adsense/'],
+      ['tracker', '.feedproxy.google.com', '~r/'],
+      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png/'],
+      ['isp', '.telus.com', 'content/internet/'],
     ], urls
 
     assert_match 'indexed 4 categorie(s): ["ads", "tracker", "isp", "news"]', stdout
@@ -182,7 +182,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['ads', '.google.com', 'adsense'],
+      ['ads', '.google.com', 'adsense/'],
     ], urls
 
     refute_match 'tracker', stdout
@@ -233,7 +233,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', '.url.com', 'path'],
+      ['cat', '.url.com', 'path/'],
     ], urls
   end
 
@@ -249,7 +249,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', '.google.com', 'path/to/file'],
+      ['cat', '.google.com', 'path/to/file/'],
     ], urls
   end
 
@@ -265,7 +265,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', '.host.com', 'path_with__invalid_byte'],
+      ['cat', '.host.com', 'path_with__invalid_byte/'],
     ], urls
   end
 
@@ -302,8 +302,8 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat', '.host.com', 'path'],
-      ['copy_of_cat', '.host.com', 'path'],
+      ['cat', '.host.com', 'path/'],
+      ['copy_of_cat', '.host.com', 'path/'],
     ], urls
 
     assert_match 'found 12 duplicate(s)', stdout
@@ -354,7 +354,7 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['cat_name', '.google.com', 'adsense'],
+      ['cat_name', '.google.com', 'adsense/'],
     ], urls
 
     refute_match 'tracker', stdout
@@ -405,9 +405,9 @@ class TestDatabase < MiniTest::Test
 
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
-      ['ads', '.google.com', 'adsense'],
-      ['tracker', '.feedproxy.google.com', '~r'],
-      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png'],
+      ['ads', '.google.com', 'adsense/'],
+      ['tracker', '.feedproxy.google.com', '~r/'],
+      ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png/'],
     ], urls
 
     assert_match 'found 0 domain(s)', stdout
