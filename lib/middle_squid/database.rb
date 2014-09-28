@@ -84,8 +84,10 @@ module MiddleSquid::Database
         pn = Pathname.new file
         next unless pn.file?
 
-        category = pn.dirname.basename.to_s
-        category = aliases[category] if aliases.has_key? category
+        dirname = pn.dirname.basename.to_s
+        category = aliases.has_key?(dirname) \
+          ? aliases[dirname]
+          : dirname
 
         if MiddleSquid::Config.minimal_indexing
           next unless cats_in_use.include? category
@@ -93,7 +95,7 @@ module MiddleSquid::Database
 
         indexed_cats << category
 
-        puts "indexing #{category}/#{pn.basename}"
+        puts "indexing #{dirname}/#{pn.basename}"
 
         File.foreach(file) { |line|
           type = append_to category, line

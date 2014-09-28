@@ -358,6 +358,7 @@ class TestDatabase < MiniTest::Test
     ], urls
 
     refute_match 'tracker', stdout
+    assert_match 'indexing ads/', stdout
     assert_match 'indexed 1 categorie(s): ["cat_name"]', stdout
 
     assert_empty stderr
