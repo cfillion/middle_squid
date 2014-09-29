@@ -11,6 +11,7 @@ MiddleSquid is a redirector, url mangler and webpage interceptor for the squid H
 **Limitations**
 
 - HTTPS is currently unsupported.
+
     Even when [SslBump](http://wiki.squid-cache.org/Features/SslBump) is
     enabled, Squid does not handle HTTPS redirections very well.
 
@@ -20,6 +21,11 @@ Assuming [Squid](http://www.squid-cache.org/) is installed and running as user '
 These instructions were written for [ArchLinux](https://www.archlinux.org/).
 Some adaptation to your favorite operating system may be necessary, at your
 discretion.
+
+**Dependencies:**
+
+- Squid 3.5 or newer
+- Ruby 2.1 or newer
 
 ### Step 1: Set a home folder for user 'proxy'
 
@@ -53,7 +59,7 @@ exec $GEM_HOME/bin/middle_squid $*
 
 ### Step 4: Setup Squid
 
-Add this line to `/etc/squid/squid.conf`:
+Add this line to your `/etc/squid/squid.conf`:
 
 ```rc
 url_rewrite_program /usr/bin/sh /usr/local/bin/middle_squid_wrapper.sh -C /home/proxy/middle_squid_config.rb
@@ -63,9 +69,9 @@ Finish with `sudo squid -k reconfigure`. Check `/var/log/squid/cache.log` for er
 
 ## Configuration
 
-MiddleSquid is configured using the ruby script specified in the command line by the `-C` or `--config-file` argument.
+MiddleSquid is configured by the ruby script specified in the command line by the `-C` or `--config-file` argument.
 
-The file must call the `run` method at the very end:
+The script must call the `run` method at the very end:
 
 ```ruby
 run proc {|uri, extras|
