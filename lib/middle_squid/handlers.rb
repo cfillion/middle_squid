@@ -1,3 +1,4 @@
+# @api private
 module MiddleSquid::Handlers
   class Input < EventMachine::Connection
     def initialize(callback)

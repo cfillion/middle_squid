@@ -1,3 +1,4 @@
+# @api private
 module MiddleSquid::Database
   @@db = nil
 
@@ -143,7 +144,7 @@ module MiddleSquid::Database
     # fix for dirty lists
     line.tr! '\\', '/'
 
-    uri = Addressable::URI.parse "http://#{line}"
+    uri = MiddleSquid::URI.parse "http://#{line}"
     host, path = uri.cleanhost, uri.cleanpath
 
     if path.empty?
