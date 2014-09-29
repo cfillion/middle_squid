@@ -21,8 +21,10 @@ sudo usermod --home /home/proxy proxy
 
 ```sh
 sudo su - proxy
+
 gem install middle_squid
 echo '# the configuration will be here' > middle_squid_config.rb
+
 exit
 ```
 
@@ -61,7 +63,8 @@ run proc {|uri, extras|
 
 The argument must be an object that responds to the `call` method and taking two arguments:
 the uri to process and an array of extra data received from squid
-(see [url_rewrite_extras](http://www.squid-cache.org/Doc/config/url_rewrite_extras/)).
+(see url_rewrite_extras in
+[squid's documentation](http://www.squid-cache.org/Doc/config/url_rewrite_extras/)).
 
 Write this in the file `/home/proxy/middle_squid_config.rb` we have created earlier:
 
@@ -73,12 +76,12 @@ run proc {|uri, extras|
 
 Run `sudo squid -k reconfigure` again to restart all MiddleSquid processes.
 You sould now be redirected to http://duckduckgo.com each time you visit
-http://google.com (non-HTTPS version) using your Squid proxy.
+http://google.com (the non-HTTPS version) using your Squid proxy.
 
 ### Black Lists
 
 While it may be fun to redirect yourself to an alternate search engine,
-MiddleSquid is more useful at blocking annoying advertisements and the tracking
+MiddleSquid is more useful at blocking annoying advertisements and tracking
 services that are constantly watching your whereabouts.
 
 MiddleSquid can scan any black list collection distributed in plain-text format
@@ -109,16 +112,18 @@ run proc {|uri, extras|
 }
 ```
 
-Next we have to download a blacklist and ask MiddleSquid to index its content to
-the database for fast access.
+Next we have to download a blacklist and ask MiddleSquid to index its content
+in the database for fast access.
 
 ```sh
 sudo su - proxy
 
+# Download Shalla's Blacklists
 wget "http://www.shallalist.de/Downloads/shallalist.tar.gz" -O shallalist.tar.gz
 tar xzf shallalist.tar.gz
 mv BL ShallaBlackList
 
+# Construct MiddleSquid's database
 /usr/local/bin/middle_squid_wrapper.sh build ShallaBlackList -C /etc/squid/middle_squid.rb
 
 exit
@@ -139,6 +144,12 @@ MiddleSquid's documentation is hosted at
 - [List of predefined actions](http://rubydoc.info/gems/middle_squid/MiddleSquid/Actions)
 - [List of predefined helpers](http://rubydoc.info/gems/middle_squid/MiddleSquid/Helpers)
 - [List of configuration settings](http://rubydoc.info/gems/middle_squid/MiddleSquid/Config)
+
+## Changelog
+
+### v0.1 (00/00/2014)
+
+First public release.
 
 ## Future Plans
 
