@@ -28,7 +28,7 @@ module MiddleSquid::Helpers
   #     intercept {|req, res|
   #       status, headers, body = download_like req, uri
   #
-  #       if status == 200
+  #       if status.is_a? Fixnum
   #         # ...
   #       else
   #         [500, {}, "Got an error: #{status}"]
