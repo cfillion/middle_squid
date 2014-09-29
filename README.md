@@ -24,8 +24,8 @@ discretion.
 
 **Dependencies:**
 
-- Squid 3.5 or newer
-- Ruby 2.1 or newer
+- Squid version 3.4 or newer
+- Ruby version 2.1 or newer
 
 ### Step 1: Set a home folder for user 'proxy'
 

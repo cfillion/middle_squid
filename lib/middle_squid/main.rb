@@ -105,7 +105,7 @@ class MiddleSquid
     url, *extras = parts
 
     # squid sends https url in the format "domain:port", without the scheme
-    # FIXME: https support?
+    # when SslBump is disabled (= we can't redirect/intercept the request)
     accept if url && !url.include?('://')
 
     uri = URI.parse url
