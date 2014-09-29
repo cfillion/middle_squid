@@ -7,13 +7,8 @@ MiddleSquid is a redirector, url mangler and webpage interceptor for the squid H
 - Configuration is done by writing a simple ruby script
 - Supports plain-text domains/urls blacklists
 - Can intercept and modify any HTTP request or response
-
-**Limitations**
-
-- HTTPS is currently unsupported.
-
-    Even when [SslBump](http://wiki.squid-cache.org/Features/SslBump) is
-    enabled, Squid does not handle HTTPS redirections very well.
+- Works with HTTPS
+    if [SslBump](http://wiki.squid-cache.org/Features/SslBump) is enabled.
 
 ## Installation & Setup
 
