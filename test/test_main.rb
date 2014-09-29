@@ -42,9 +42,4 @@ class TestMain < MiniTest::Test
 
     assert_equal [[MiddleSquid::Config]], bag
   end
-
-  def test_internal_server_address
-    assert_nil @ms.server_host
-    assert_nil @ms.server_port
-  end
 end

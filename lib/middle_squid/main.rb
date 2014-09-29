@@ -2,26 +2,9 @@ class MiddleSquid
   include Actions
   include Helpers
 
-  PURGE_DELAY = 10
-  SERVER_HOST = '127.0.0.1'.freeze
-  IGNORED_HEADERS = [
-    'Connection',
-    'Content-Encoding',
-    'Content-Length',
-    'Host',
-    'Transfer-Encoding',
-    'Version',
-  ].freeze
-
-  # @return [String]
-  attr_reader :server_host
-
-  # @return [Fixnum]
-  attr_reader :server_port
-
   def initialize
-    @tokens = {}
     @run_was_called = false
+    @server = MiddleSquid::HTTP.server
   end
 
   # Evalutate a configuration file.
@@ -92,8 +75,7 @@ class MiddleSquid
 
       server.start
 
-      sockname = EM.get_sockname server.backend.signature
-      @server_port, @server_host = Socket.unpack_sockaddr_in sockname
+      @server.start
     }
   end
 
@@ -118,36 +100,5 @@ class MiddleSquid
     chan_id ? "#{chan_id} #{action.line}" : action.line if action.line
   rescue InvalidURI, Addressable::URI::InvalidURIError
     warn "[MiddleSquid] invalid uri received: '#{url}'\n\tin '#{line}'"
-  end
-
-  def http_handler(env)
-    callback = @tokens[env['PATH_INFO'][1..-1]]
-
-    return [
-      404,
-      {'Content-Type' => 'text/plain'},
-      ['[MiddleSquid] Invalid Token']
-    ] unless callback
-
-    request  = Rack::Request.new env
-    response = Thin::AsyncResponse.new env
-
-    Fiber.new {
-      retval = callback.call request, response
-
-      if retval.is_a?(Array) && retval.size == 3
-        status, headers, body = retval
-
-        sanitize_headers! headers
-
-        response.status = status
-        response.headers.merge! headers
-        response.write body
-      end
-
-      response.done
-    }.resume
-
-    response.finish
   end
 end

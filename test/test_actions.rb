@@ -56,18 +56,18 @@ class TestActions < MiniTest::Test
   end
 
   def test_intercept
-    @obj.instance_eval do
-      @server_host = '127.0.0.1'
-      @server_port = 8901
-    end
+    MiddleSquid::HTTP.server.stub :host, '127.0.0.1' do
+      MiddleSquid::HTTP.server.stub :port, 8901 do
+        action = assert_raises MiddleSquid::Action do
+          EM.run {
+            @obj.intercept {}
+            EM.next_tick { EM.stop }
+          }
+        end
 
-    action = assert_raises MiddleSquid::Action do
-      EM.run {
-        @obj.intercept {}
-      }
+        assert_match /\AOK rewrite-url=http:\/\/127.0.0.1:8901\/[\w-]+\z/, action.line
+      end
     end
-
-    assert_match /\AOK rewrite-url=http:\/\/127.0.0.1:8901\/[\w-]+\z/, action.line
   end
 
   def test_intercept_requires_a_block

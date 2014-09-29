@@ -70,8 +70,4 @@ class TestHandlers < MiniTest::Test
 
     assert_equal [['hello world']], bag
   end
-
-  def test_http_constructor
-    MiddleSquid::Handlers::HTTP.new '', 0, []
-  end
 end

@@ -16,6 +16,10 @@ require 'middle_squid/actions'
 require 'middle_squid/database'
 require 'middle_squid/helpers'
 
+require 'middle_squid/http'
+require 'middle_squid/http/server'
+require 'middle_squid/http/thin_backend'
+
 require 'middle_squid/blacklist'
 require 'middle_squid/cli'
 require 'middle_squid/config'

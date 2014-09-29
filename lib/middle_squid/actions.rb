@@ -84,17 +84,10 @@ module MiddleSquid::Actions
   def intercept(&block)
     raise ArgumentError, 'no block given' unless block_given?
 
-    # FIXME: move the token generation code in a Server class
-    @tokens ||= {} # this line will go away
+    server = MiddleSquid::HTTP.server
+    token = server.token_for block
 
-    token = SecureRandom.uuid
-    @tokens[token] = block
-
-    EM.add_timer(MiddleSquid::PURGE_DELAY) {
-      @tokens.delete token
-    }
-
-    replace_by "http://#{@server_host}:#{@server_port}/#{token}"
+    replace_by "http://#{server.host}:#{server.port}/#{token}"
   end
 
   #

@@ -3,6 +3,9 @@ require 'simplecov'
 SimpleCov.start {
   project_name 'MiddleSquid'
   add_filter '/test/'
+
+  add_group 'Adapters', '/adapter'
+  add_group 'HTTP', '/http'
 }
 
 require 'minitest/autorun'

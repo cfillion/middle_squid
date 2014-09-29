@@ -50,7 +50,7 @@ module MiddleSquid::Helpers
       select {|k| k.start_with? 'HTTP_' }.
       each {|key, val| headers[key[5..-1]] = val }
 
-    sanitize_headers! headers
+    MiddleSquid::HTTP.sanitize_headers! headers
 
     options = {
       :head => headers,
@@ -63,7 +63,7 @@ module MiddleSquid::Helpers
       headers = http.response_header
       body = http.response
 
-      sanitize_headers! headers
+      MiddleSquid::HTTP.sanitize_headers! headers
 
       fiber.resume [status, headers, body]
     }
@@ -75,19 +75,4 @@ module MiddleSquid::Helpers
   #
   # @!endgroup
   #
-
-  # FIXME: should not be here. move to a new HTTP class
-  private
-  def sanitize_headers!(dirty)
-    clean = {}
-    dirty.each {|key, value|
-      key = key.split('_').map(&:capitalize).join('-')
-      next if MiddleSquid::IGNORED_HEADERS.include? key
-
-      clean[key] = value
-    }
-
-    dirty.clear
-    dirty.merge! clean
-  end
 end
