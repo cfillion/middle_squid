@@ -82,7 +82,7 @@ module MiddleSquid::Database
       end
 
       files = Dir.glob File.join(directory, '*/*')
-      files.sort!
+      files.sort! # fixes travis build
 
       files.each do |file|
         pn = Pathname.new file

@@ -1,7 +1,7 @@
 class MiddleSquid
   Error = Class.new RuntimeError
 
-  # Use {MiddleSquid#action MiddleSquid#action} to raise this exception.
+  # Use {Actions#action Actions#action} to raise this exception.
   class Action < Exception
     # @return [String]
     attr_reader :line

@@ -12,7 +12,9 @@ require 'thin'
 require 'thin/async'
 require 'thor'
 
+require 'middle_squid/actions'
 require 'middle_squid/database'
+require 'middle_squid/helpers'
 
 require 'middle_squid/blacklist'
 require 'middle_squid/cli'
