@@ -81,7 +81,10 @@ module MiddleSquid::Database
         next
       end
 
-      Dir.glob File.join(directory, '*/*') do |file|
+      files = Dir.glob File.join(directory, '*/*')
+      files.sort!
+
+      files.each do |file|
         pn = Pathname.new file
         next unless pn.file?
 
@@ -137,9 +140,8 @@ module MiddleSquid::Database
     # ignore regex lists
     return :ignored unless line[0] =~ /\w/
 
-    # strip invalid bytes
-    line.encode! Encoding::UTF_8,
-      invalid: :replace, undef: :replace, replace: ''
+    # fix invalid bytes
+    line.scrub! ''
 
     # fix for dirty lists
     line.tr! '\\', '/'
