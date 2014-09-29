@@ -2,6 +2,18 @@
 
 MiddleSquid is a redirector, url mangler and webpage interceptor for the squid HTTP proxy.
 
+**Features**
+
+- Configuration is done by writing a simple ruby script
+- Supports plain-text domains/urls blacklists
+- Can intercept and modify any HTTP request or response
+
+**Limitations**
+
+- HTTPS is currently unsupported.
+    Even when [SslBump](http://wiki.squid-cache.org/Features/SslBump) is
+    enabled, Squid does not handle HTTPS redirections very well.
+
 ## Installation & Setup
 
 Assuming [Squid](http://www.squid-cache.org/) is installed and running as user 'proxy'.
@@ -123,7 +135,7 @@ wget "http://www.shallalist.de/Downloads/shallalist.tar.gz" -O shallalist.tar.gz
 tar xzf shallalist.tar.gz
 mv BL ShallaBlackList
 
-# Construct MiddleSquid's database
+# Construct the blacklist database
 /usr/local/bin/middle_squid_wrapper.sh build ShallaBlackList -C /etc/squid/middle_squid.rb
 
 exit
