@@ -8,20 +8,23 @@ class TestSquid < MiniTest::Test
   make_my_diffs_pretty!
 
   def setup
-    @ms = MiddleSquid.new
+    EM.run {
+      @obj = MiddleSquid::Adapters::Squid.new
+      EM.next_tick { EM.stop }
+    }
   end
 
-  def test_squid_handler_arguments
+  def test_input
     bag = []
 
-    @ms.instance_eval do
-      @user_callback = proc {|*args| bag << args }
+    @obj.callback = proc {|*args| bag << args }
 
+    capture_io do
       MiddleSquid::Config.concurrency = false
-      squid_handler SQUID_LINE
+      @obj.input SQUID_LINE
 
       MiddleSquid::Config.concurrency = true
-      squid_handler CONCURRENT_LINE
+      @obj.input CONCURRENT_LINE
     end
 
     uri = MiddleSquid::URI.parse 'http://cfillion.tk/'
@@ -39,78 +42,25 @@ class TestSquid < MiniTest::Test
     ], bag
   end
 
-  def test_squid_handler_output
+  def test_output
     bag = []
 
-    @ms.instance_eval do
-      @user_callback = proc { action 'test' }
+    @obj.callback = proc { raise MiddleSquid::Action.new 'test' }
 
-      MiddleSquid::Config.concurrency = false
-      bag << squid_handler(SQUID_LINE)
-
-      MiddleSquid::Config.concurrency = true
-      bag << squid_handler(CONCURRENT_LINE)
-    end
-
-    assert_equal ['test', '0 test'], bag
-  end
-
-  def test_squid_handler_drop
-    bag = []
-
-    @ms.instance_eval do
-      @user_callback = proc { action nil }
-
-      MiddleSquid::Config.concurrency = false
-      bag << squid_handler(SQUID_LINE)
-
-      MiddleSquid::Config.concurrency = true
-      bag << squid_handler(CONCURRENT_LINE)
-    end
-
-    assert_equal [nil, nil], bag
-  end
-
-  def test_squid_handler_default_action
-    bag = []
-
-    @ms.instance_eval do
-      @user_callback = proc {}
-
-      MiddleSquid::Config.concurrency = false
-      bag << squid_handler(SQUID_LINE)
-
-      MiddleSquid::Config.concurrency = true
-      bag << squid_handler(CONCURRENT_LINE)
-    end
-
-    assert_equal ['ERR', '0 ERR'], bag
-  end
-
-  def test_squid_handler_invalid_uris
     MiddleSquid::Config.concurrency = false
-
-    bag = []
-
     stdout, stderr = capture_io do
-      @ms.instance_eval do
-        @user_callback = proc { @ms.drop }
-
-        bag << squid_handler('')
-        bag << squid_handler('http:// extra')
-        bag << squid_handler('hello:world') # => https
-      end
+      @obj.input(SQUID_LINE)
     end
 
-    assert_equal [nil, nil, 'ERR'], bag
+    assert_equal "test\n", stdout
+    assert_empty stderr
 
-    assert_empty stdout
-    assert_equal [
-      "[MiddleSquid] invalid uri received: ''\n",
-      "\tin ''\n",
+    MiddleSquid::Config.concurrency = true
+    stdout, stderr = capture_io do
+      @obj.input(CONCURRENT_LINE)
+    end
 
-      "[MiddleSquid] invalid uri received: 'http://'\n",
-      "\tin 'http:// extra'\n",
-    ], stderr.lines
+    assert_equal "0 test\n", stdout
+    assert_empty stderr
   end
 end

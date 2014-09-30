@@ -1,11 +1,8 @@
-# @api private
-module MiddleSquid::Handlers
-  class Input < EventMachine::Connection
+module MiddleSquid::Backends
+  class Keyboard < EventMachine::Connection
     def initialize(callback)
       @buffer = []
       @callback = callback
-
-      super
     end
 
     def receive_data(char)
@@ -22,20 +19,7 @@ module MiddleSquid::Handlers
 
     def receive_line(line)
       # EventMachine sends ASCII-8BIT strings, somehow preventing the databases queries to match
-      reply = @callback.call line.force_encoding(Encoding::UTF_8)
-
-      if reply
-        puts reply
-        STDOUT.flush
-      end
-    end
-  end
-
-  class HTTP < Thin::Backends::TcpServer
-    attr_reader :signature
-
-    def initialize(host, port, options)
-      super host, port
+      @callback.call line.force_encoding(Encoding::UTF_8)
     end
   end
 end

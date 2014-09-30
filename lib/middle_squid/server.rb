@@ -1,4 +1,4 @@
-module MiddleSquid::HTTP
+module MiddleSquid
   class Server
     DEFAULT_HOST = '127.0.0.1'.freeze
     DEFAULT_PORT = 0
@@ -17,7 +17,7 @@ module MiddleSquid::HTTP
     def initialize
       @tokens = {}
       @thin = Thin::Server.new DEFAULT_HOST, DEFAULT_PORT, method(:handler),
-        :backend => ThinBackend,
+        :backend => Backends::Thin,
         :signals => false
     end
 
@@ -63,7 +63,7 @@ module MiddleSquid::HTTP
         if retval.is_a?(Array) && retval.size == 3
           status, headers, body = retval
 
-          MiddleSquid::HTTP.sanitize_headers! headers
+          headers.sanitize_headers!
 
           response.status = status
           response.headers.merge! headers

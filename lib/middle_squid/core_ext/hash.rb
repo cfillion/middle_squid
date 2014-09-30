@@ -1,4 +1,4 @@
-module MiddleSquid::HTTP
+class Hash
   IGNORED_HEADERS = [
     'Connection',
     'Content-Encoding',
@@ -8,20 +8,21 @@ module MiddleSquid::HTTP
     'Version',
   ].freeze
 
-  def self.server;
-    @server ||= Server.new
-  end
+  DASH = '-'.freeze
+  UNDERSCORE = '_'.freeze
 
-  def self.sanitize_headers!(dirty)
+  def sanitize_headers!
     clean = {}
-    dirty.each {|key, value|
-      key = key.split('_').map(&:capitalize).join('-')
+    each {|key, value|
+      key = key.tr UNDERSCORE, DASH
+      key = key.split(DASH).map(&:capitalize).join(DASH)
+
       next if IGNORED_HEADERS.include? key
 
       clean[key] = value
     }
 
-    dirty.clear
-    dirty.merge! clean
+    clear
+    merge! clean
   end
 end

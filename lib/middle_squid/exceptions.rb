@@ -1,5 +1,6 @@
-class MiddleSquid
+module MiddleSquid
   Error = Class.new RuntimeError
+  InvalidURIError = Class.new Addressable::URI::InvalidURIError
 
   # Use {Actions#action Actions#action} to raise this exception.
   class Action < Exception
@@ -12,6 +13,4 @@ class MiddleSquid
       @line = line
     end
   end
-
-  InvalidURI = Class.new Exception
 end

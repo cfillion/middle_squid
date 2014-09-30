@@ -5,7 +5,7 @@ SimpleCov.start {
   add_filter '/test/'
 
   add_group 'Adapters', '/adapter'
-  add_group 'HTTP', '/http'
+  add_group 'Backends', '/backend'
 }
 
 require 'minitest/autorun'

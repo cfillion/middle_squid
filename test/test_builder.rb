@@ -1,8 +1,8 @@
 require File.expand_path '../helper', __FILE__
 
-class TestMain < MiniTest::Test
+class TestBuilder < MiniTest::Test
   def setup
-    @ms = MiddleSquid.new
+    @ms = MiddleSquid::Builder.new
   end
 
   def test_eval

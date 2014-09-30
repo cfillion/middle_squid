@@ -1,10 +1,10 @@
 require File.expand_path '../helper', __FILE__
 
-class TestHttpServer < MiniTest::Test
+class TestServer < MiniTest::Test
   include Rack::Test::Methods
 
   def setup
-    @server = MiddleSquid::HTTP::Server.new
+    @server = MiddleSquid::Server.new
     @app = Thin::Async::Test.new @server.method(:handler)
   end
 
