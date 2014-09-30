@@ -64,7 +64,7 @@ module MiddleSquid
       @run_was_called = true
 
       EM.run {
-        adapter = SquidAdapter.new
+        adapter = Adapters::Squid.new
         adapter.callback = callback
 
         @server.start
