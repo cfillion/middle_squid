@@ -33,19 +33,19 @@ module MiddleSquid
     option :'config-file', :required => false, :aliases => ['-C']
     def version
       puts "MiddleSquid #{MiddleSquid::VERSION}"
-      puts <<-GPL
-      Copyright (C) 2014 by Christian Fillion
+      puts <<GPL
+Copyright (C) 2014 by Christian Fillion
 
-          This program is free software; you can redistribute it and/or
-      modify it under the terms of the GNU General Public License as
-      published by the Free Software Foundation, either version 3 of
-      the License, or (at your option) any later version.
+  This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.
 
-          This program is distributed in the hope that it will be useful,
-      but WITHOUT ANY WARRANTY; without even the implied warranty of
-      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-      General Public License for more details.
-      GPL
+  This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+GPL
     end
 
     desc 'help', 'show this message or describe a command'
