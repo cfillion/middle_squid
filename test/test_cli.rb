@@ -6,13 +6,13 @@ class TestCLI < MiniTest::Test
     conf = File.join path, 'hello.rb'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[exec -C #{conf}])
+      EM.run {
+        MiddleSquid::CLI.start(%W[exec -C #{conf}])
+        EM.next_tick { EM.stop }
+      }
     end
 
     assert_match /\Ahello #<MiddleSquid:.+>\Z/, stdout
-
-    #
-    # assert_match /The configuration file did not call MiddleSquid#run\./, stderr
   end
 
   def test_exec_relative
@@ -22,7 +22,10 @@ class TestCLI < MiniTest::Test
     conf = File.join '~', path, 'hello.rb'
 
     capture_io do
-      MiddleSquid::CLI.start(%W[exec -C #{conf}])
+      EM.run {
+        MiddleSquid::CLI.start(%W[exec -C #{conf}])
+        EM.next_tick { EM.stop }
+      }
     end
   end
 

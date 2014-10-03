@@ -166,7 +166,7 @@ module MiddleSquid::Database
   end
 
   def db
-    raise "The database is not initialized. Did you forgot to call Builder#database in your configuration file?" unless @@db
+    raise "The database is not initialized. Did you call Builder#database in your configuration file?" unless @@db
 
     @@db
   end

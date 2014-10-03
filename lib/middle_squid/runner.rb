@@ -3,11 +3,10 @@ module MiddleSquid
     include Actions
     include Helpers
 
+    attr_reader :server
+
     def initialize(builder)
-      unless builder.handler
-        warn '[MiddleSquid] ERROR: Invalid configuration: #run was not called.'
-        return
-      end
+      raise Error, 'MiddleSquid is not initialized. Did you call Builder#run in your configuration file?' unless builder.handler
 
       define_singleton_method :_handler, builder.handler
 

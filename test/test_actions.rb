@@ -78,10 +78,4 @@ class TestActions < MiniTest::Test
       @obj.intercept
     end
   end
-
-  def test_method_missing
-    assert_raises NoMethodError do
-      @obj.not_found
-    end
-  end
 end
