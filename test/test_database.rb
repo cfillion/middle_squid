@@ -26,6 +26,17 @@ class TestDatabase < MiniTest::Test
     MiddleSquid::BlackList.class_eval '@@instances.clear' # temporary hack
   end
 
+  def test_resetup
+    before = db()
+    refute before.closed?
+
+    MiddleSquid::Database.setup ':memory:'
+
+    after = db()
+    refute_same before, after
+    assert before.closed?, 'the old database should be closed'
+  end
+
   def teardown
     # FIXME: remove
     MiddleSquid::BlackList.class_eval '@@instances.clear'
