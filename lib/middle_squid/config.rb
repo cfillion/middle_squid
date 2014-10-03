@@ -2,26 +2,10 @@
 #
 # @see MiddleSquid#config MiddleSquid#config
 module MiddleSquid::Config
-  @concurrency = false
-  @database = 'blacklist.db'
   @index_entries = [:domain, :url]
   @minimal_indexing = true
 
   class << self
-    # Whether to expect a channel ID.
-    # Enable if the concurrency option in set to > 0 in squid
-    # (see http://www.squid-cache.org/Doc/config/url_rewrite_children/).
-    #
-    # @return [Boolean] defaults to <code>false</code>.
-    attr_accessor :concurrency
-
-    # Path to the blacklist database (SQLite).
-    # The database will be created if the file does not exists.
-    # Read/write access is required.
-    #
-    # @return [String] defaults to <code>blacklist.db</code>
-    attr_accessor :database
-
     # Limits what to index in the blacklist database.
     # The supported values are:
     # - <code>:domain</code> --- Match host names. Eg. rubydoc.info, 127.0.0.1
