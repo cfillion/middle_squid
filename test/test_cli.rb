@@ -39,14 +39,12 @@ class TestCLI < MiniTest::Test
   end
 
   def test_index
-    MiddleSquid::Config.minimal_indexing = false
-
     path = File.expand_path '../resources', __FILE__
     conf = File.join path, 'hello.rb'
     list = File.join path, 'black'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[index #{list} -C #{conf}])
+      MiddleSquid::CLI.start(%W[index #{list} -C #{conf} --full])
     end
 
     assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
@@ -54,8 +52,6 @@ class TestCLI < MiniTest::Test
   end
 
   def test_index_relative_path
-    MiddleSquid::Config.minimal_indexing = false
-
     absolute = File.expand_path '../resources', __FILE__
     path = Pathname.new(absolute).relative_path_from(Pathname.new(Dir.home))
 
@@ -63,7 +59,7 @@ class TestCLI < MiniTest::Test
     list = File.join '~', path, 'black'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[index #{list} -C #{conf}])
+      MiddleSquid::CLI.start(%W[index #{list} -C #{conf} --full])
     end
 
     assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
@@ -71,15 +67,13 @@ class TestCLI < MiniTest::Test
   end
 
   def test_index_multiple
-    MiddleSquid::Config.minimal_indexing = false
-
     path = File.expand_path '../resources', __FILE__
     config = File.join path, 'hello.rb'
     list_1 = File.join path, 'black'
     list_2 = File.join path, 'gray'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[index #{list_1} #{list_2} -C #{config}])
+      MiddleSquid::CLI.start(%W[index #{list_1} #{list_2} -C #{config} --full])
     end
 
     assert_match "reading #{list_1}", stdout

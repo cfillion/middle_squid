@@ -1,5 +1,5 @@
-# @see http://wiki.squid-cache.org/Features/Redirectors
 module MiddleSquid
+  # @see http://wiki.squid-cache.org/Features/Redirectors
   class Adapters::Squid < Adapter
     def start
       warn "[MiddleSquid] WARNING: STDOUT is a terminal. This command should be launched from squid." if STDOUT.tty?
