@@ -23,9 +23,11 @@ class TestDatabase < MiniTest::Test
 
     MiddleSquid::Config.minimal_indexing = false
     MiddleSquid::Config.index_entries = [:domain, :url]
+    MiddleSquid::BlackList.class_eval '@@instances.clear' # temporary hack
   end
 
   def teardown
+    # FIXME: remove
     MiddleSquid::BlackList.class_eval '@@instances.clear'
   end
 
@@ -39,21 +41,6 @@ class TestDatabase < MiniTest::Test
     )
 
     has_domain || has_url
-  end
-
-  def test_reuse
-    MiddleSquid::Database.setup
-    first = db()
-
-    MiddleSquid::Database.setup
-    second = db()
-
-    assert_same first, second
-  end
-
-  def test_automatic_setup
-    MiddleSquid::Database.class_eval '@@db = nil'
-    assert_instance_of SQLite3::Database, db()
   end
 
   def test_minimal_no_blacklist_used

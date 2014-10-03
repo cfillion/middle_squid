@@ -15,4 +15,4 @@ require 'webmock/minitest'
 
 require 'middle_squid'
 
-MiddleSquid::Config.database = ':memory:'
+MiddleSquid::Database.setup ':memory:'

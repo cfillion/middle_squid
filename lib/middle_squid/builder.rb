@@ -1,48 +1,62 @@
 module MiddleSquid
   class Builder
-    include Actions
-    include Helpers
+    attr_reader :adapter, :blacklists, :custom_actions, :handler
 
     def initialize
-      @run_was_called = false
-      @server = Server.new
+      @blacklists = []
+      @custom_actions = {}
     end
 
-    # Evalutate a configuration file.
-    #
-    # @api private
-    def eval(file, inhibit_run: false)
-      @inhibit_run = inhibit_run
-
+    def self.from_file(file)
+      obj = self.new
       content = File.read file
-      instance_eval content, file
-    ensure
-      @inhibit_run = false
+
+      obj.instance_eval content, file
+      obj
     end
 
-    # Whether {#run} was called.
-    #
-    # @api private
-    def ran?
-      @run_was_called
+    def use(adapter, **options)
+      raise ArgumentError, 'Not an adapter.' unless adapter < Adapter
+      @adapter = adapter.new(options)
     end
 
-    # Tweak MiddleSquid settings.
-    # See {Config} for the list of available options.
+    def adapter
+      @adapter ||= Adapters::Squid.new
+    end
+
+    # Path to the blacklist database (SQLite).
+    # The database will be created if the file does not exists.
+    # Read/write access is required.
     #
-    # @example Default values
-    #   config do |c|
-    #     c.concurrency = false
-    #     c.database = 'blacklist.db'
-    #     c.index_entries = [:domain, :url]
-    #     c.minimal_indexing = true
+    # @param path [String]
+    def database(path)
+      Database.setup path
+    end
+
+    def blacklist(*args)
+      bl = BlackList.new *args
+      @blacklists << bl
+      bl
+    end
+
+    # Register a custom action (only in the current instance).
+    #
+    # @example Don't Repeat Yourself
+    #   define_action :block do
+    #     redirect_to 'http://goodsite.com/'
     #   end
     #
-    #   # run proc {|uri, extras| ... }
-    # @return [Config]
-    def config
-      yield Config if block_given?
-      Config
+    #   run {|uri, extras|
+    #     block if uri.host == 'badsite.com'
+    #     # ...
+    #     block if uri.host == 'terriblesite.com'
+    #   }
+    # @param name  [Symbol] method name
+    # @param block [Proc]   method body
+    def define_action(name, &block)
+      raise ArgumentError, 'no block given' unless block_given?
+
+      @custom_actions[name] = block
     end
 
     # Start the squid helper and the internal server.
@@ -56,19 +70,9 @@ module MiddleSquid
     #   }
     # @param callback [#call<URI, Array>]
     # @see http://www.squid-cache.org/Doc/config/url_rewrite_extras/
-    def run(callback)
-      return if @inhibit_run
-
-      BlackList.deadline!
-
-      @run_was_called = true
-
-      EM.run {
-        adapter = Adapters::Squid.new
-        adapter.callback = callback
-
-        @server.start
-      }
+    def run(handler)
+      raise ArgumentError, 'the handler must respond to #call' unless handler.respond_to? :call
+      @handler = handler
     end
   end
 end

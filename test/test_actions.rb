@@ -79,22 +79,6 @@ class TestActions < MiniTest::Test
     end
   end
 
-  def test_define_action
-    bag = []
-
-    @obj.define_action(:hello) {|*args| bag << args }
-    @obj.hello :world
-
-    assert_equal [[:world]], bag
-    refute_includes @obj.class.instance_methods, :hello
-  end
-
-  def test_define_action_requires_a_block
-    assert_raises ArgumentError do
-      @obj.define_action :test
-    end
-  end
-
   def test_method_missing
     assert_raises NoMethodError do
       @obj.not_found

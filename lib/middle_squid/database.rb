@@ -1,11 +1,10 @@
-# @api private
 module MiddleSquid::Database
   @@db = nil
 
-  def self.setup
-    return if @@db
+  def self.setup(path)
+    @@db.close if @@db
 
-    @@db = SQLite3::Database.new MiddleSquid::Config.database
+    @@db = SQLite3::Database.new path
 
     @@db.execute <<-SQL
     CREATE TABLE IF NOT EXISTS domains (
@@ -66,7 +65,6 @@ module MiddleSquid::Database
       :duplicate => 0,
     }
 
-    setup
     @@db.transaction
 
     puts "truncating database"
@@ -167,9 +165,9 @@ module MiddleSquid::Database
     :duplicate
   end
 
-  private
   def db
-    MiddleSquid::Database.setup
+    raise "The database is not initialized. Did you forgot to call Builder#database in your configuration file?" unless @@db
+
     @@db
   end
 end

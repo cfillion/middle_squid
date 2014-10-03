@@ -32,6 +32,7 @@ module MiddleSquid
   require 'middle_squid/cli'
   require 'middle_squid/config'
   require 'middle_squid/exceptions'
+  require 'middle_squid/runner'
   require 'middle_squid/server'
   require 'middle_squid/uri'
 

@@ -8,7 +8,7 @@ class TestAdapter < MiniTest::Test
   def test_callback
     bag = []
 
-    @obj.callback = proc {|*args| bag << args }
+    @obj.handler = proc {|*args| bag << args }
 
     @obj.define_singleton_method(:output) { |*args| bag << args }
 
@@ -29,7 +29,7 @@ class TestAdapter < MiniTest::Test
     action = MiddleSquid::Action.new 'test'
     bag = []
 
-    @obj.callback = proc { raise action }
+    @obj.handler = proc { raise action }
 
     @obj.define_singleton_method(:output) { |*args| bag << args }
 

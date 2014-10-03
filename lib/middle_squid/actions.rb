@@ -92,37 +92,4 @@ module MiddleSquid::Actions
   #
   # @!endgroup
   #
-
-  # Register a custom action (only in the current instance).
-  #
-  # @example Don't Repeat Yourself
-  #   define_action :block do
-  #     redirect_to 'http://goodsite.com/'
-  #   end
-  #
-  #   run {|uri, extras|
-  #     block if uri.host == 'badsite.com'
-  #     # ...
-  #     block if uri.host == 'terriblesite.com'
-  #   }
-  # @param name  [Symbol] method name
-  # @param block [Proc]   method body
-  def define_action(name, &block)
-    raise ArgumentError, 'no block given' unless block_given?
-
-    custom_actions[name] = block
-  end
-
-  # @see #define_action
-  def method_missing(name, *args)
-    custom_action = custom_actions[name]
-    super unless custom_action
-
-    custom_action.call *args
-  end
-
-  private
-  def custom_actions
-    @custom_actions ||= {}
-  end
 end

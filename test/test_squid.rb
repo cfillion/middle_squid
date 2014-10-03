@@ -9,22 +9,38 @@ class TestSquid < MiniTest::Test
 
   def setup
     EM.run {
-      @obj = MiddleSquid::Adapters::Squid.new
+      @std = MiddleSquid::Adapters::Squid.new concurrency: false
+      @con = MiddleSquid::Adapters::Squid.new concurrency: true
       EM.next_tick { EM.stop }
     }
+  end
+
+  def test_start
+    stdout, stderr = capture_io do
+      EM.run {
+        @std.start
+        EM.next_tick { EM.stop }
+      }
+    end
+
+    # FIXME: I don't know how to test both cases
+    if STDOUT.tty?
+      assert_match /should be launched from squid/, stderr
+    else
+      assert_empty stderr
+    end
   end
 
   def test_input
     bag = []
 
-    @obj.callback = proc {|*args| bag << args }
+    handler = proc {|*args| bag << args }
+    @std.handler = handler
+    @con.handler = handler
 
     capture_io do
-      MiddleSquid::Config.concurrency = false
-      @obj.input SQUID_LINE
-
-      MiddleSquid::Config.concurrency = true
-      @obj.input CONCURRENT_LINE
+      @std.input SQUID_LINE
+      @con.input CONCURRENT_LINE
     end
 
     uri = MiddleSquid::URI.parse 'http://cfillion.tk/'
@@ -45,19 +61,19 @@ class TestSquid < MiniTest::Test
   def test_output
     bag = []
 
-    @obj.callback = proc { raise MiddleSquid::Action.new 'test' }
+    handler = proc { raise MiddleSquid::Action.new 'test' }
+    @std.handler = handler
+    @con.handler = handler
 
-    MiddleSquid::Config.concurrency = false
     stdout, stderr = capture_io do
-      @obj.input(SQUID_LINE)
+      @std.input(SQUID_LINE)
     end
 
     assert_equal "test\n", stdout
     assert_empty stderr
 
-    MiddleSquid::Config.concurrency = true
     stdout, stderr = capture_io do
-      @obj.input(CONCURRENT_LINE)
+      @con.input(CONCURRENT_LINE)
     end
 
     assert_equal "0 test\n", stdout

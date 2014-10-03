@@ -8,14 +8,10 @@ module MiddleSquid
     default_task :exec
     desc 'exec', 'start the squid helper (default)'
     def exec
-      warn "[MiddleSquid] WARNING: STDOUT is a terminal. This command should be launched from squid." if STDOUT.tty?
-
       config_file = File.expand_path options[:'config-file']
 
-      ms = Builder.new
-      ms.eval config_file
-
-      warn '[MiddleSquid] ERROR: The configuration file did not call MiddleSquid#run.' unless ms.ran?
+      builder = Builder.from_file config_file
+      MiddleSquid::Runner.new builder
     end
 
     desc 'build SOURCES...', 'populate the database from one or more blacklists'
@@ -23,8 +19,7 @@ module MiddleSquid
       config_file = File.expand_path options[:'config-file']
       directories.map! {|rel| File.expand_path rel }
 
-      ms = MiddleSquid::Builder.new
-      ms.eval config_file, inhibit_run: true
+      builder = Builder.from_file config_file
 
       MiddleSquid::Database.build *directories
     end
