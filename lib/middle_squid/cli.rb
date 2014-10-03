@@ -5,17 +5,17 @@ module MiddleSquid
       :desc     => 'configuration file',
       :aliases  => ['-C']
 
-    default_task :exec
-    desc 'exec', 'start the squid helper (default)'
-    def exec
+    default_task :start
+    desc 'start', 'run the given configuration file (default)'
+    def start
       config_file = File.expand_path options[:'config-file']
 
       builder = Builder.from_file config_file
       MiddleSquid::Runner.new builder
     end
 
-    desc 'build SOURCES...', 'populate the database from one or more blacklists'
-    def build(*directories)
+    desc 'index SOURCES...', 'populate the database from one or more blacklists'
+    def index(*directories)
       config_file = File.expand_path options[:'config-file']
       directories.map! {|rel| File.expand_path rel }
 

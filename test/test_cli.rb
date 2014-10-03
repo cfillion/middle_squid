@@ -1,13 +1,13 @@
 require File.expand_path '../helper', __FILE__
 
 class TestCLI < MiniTest::Test
-  def test_exec
+  def test_start
     path = File.expand_path '../resources', __FILE__
     conf = File.join path, 'hello.rb'
 
     stdout, stderr = capture_io do
       EM.run {
-        MiddleSquid::CLI.start(%W[exec -C #{conf}])
+        MiddleSquid::CLI.start(%W[start -C #{conf}])
         EM.next_tick { EM.stop }
       }
     end
@@ -15,7 +15,7 @@ class TestCLI < MiniTest::Test
     assert_match /\Ahello #<MiddleSquid:.+>\Z/, stdout
   end
 
-  def test_exec_relative
+  def test_start_relative
     absolute = File.expand_path '../resources', __FILE__
     path = Pathname.new(absolute).relative_path_from(Pathname.new(Dir.home))
 
@@ -23,22 +23,22 @@ class TestCLI < MiniTest::Test
 
     capture_io do
       EM.run {
-        MiddleSquid::CLI.start(%W[exec -C #{conf}])
+        MiddleSquid::CLI.start(%W[start -C #{conf}])
         EM.next_tick { EM.stop }
       }
     end
   end
 
-  def test_exec_missing_config
+  def test_start_missing_config
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start %w[exec]
+      MiddleSquid::CLI.start %w[start]
     end
 
     assert_empty stdout
     assert_match /no value provided for required options/i, stderr
   end
 
-  def test_build
+  def test_index
     MiddleSquid::Config.minimal_indexing = false
 
     path = File.expand_path '../resources', __FILE__
@@ -46,14 +46,14 @@ class TestCLI < MiniTest::Test
     list = File.join path, 'black'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[build #{list} -C #{conf}])
+      MiddleSquid::CLI.start(%W[index #{list} -C #{conf}])
     end
 
     assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
     assert_match "reading #{list}", stdout
   end
 
-  def test_build_relative_path
+  def test_index_relative_path
     MiddleSquid::Config.minimal_indexing = false
 
     absolute = File.expand_path '../resources', __FILE__
@@ -63,14 +63,14 @@ class TestCLI < MiniTest::Test
     list = File.join '~', path, 'black'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[build #{list} -C #{conf}])
+      MiddleSquid::CLI.start(%W[index #{list} -C #{conf}])
     end
 
     assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
     assert_match "reading #{absolute}/black", stdout
   end
 
-  def test_build_multiple
+  def test_index_multiple
     MiddleSquid::Config.minimal_indexing = false
 
     path = File.expand_path '../resources', __FILE__
@@ -79,7 +79,7 @@ class TestCLI < MiniTest::Test
     list_2 = File.join path, 'gray'
 
     stdout, stderr = capture_io do
-      MiddleSquid::CLI.start(%W[build #{list_1} #{list_2} -C #{config}])
+      MiddleSquid::CLI.start(%W[index #{list_1} #{list_2} -C #{config}])
     end
 
     assert_match "reading #{list_1}", stdout

@@ -143,12 +143,12 @@ tar xzf shallalist.tar.gz
 mv BL ShallaBlackList
 
 # Construct the blacklist database
-/usr/local/bin/middle_squid_wrapper.sh build ShallaBlackList -C /etc/squid/middle_squid.rb
+/usr/local/bin/middle_squid_wrapper.sh index ShallaBlackList -C /etc/squid/middle_squid.rb
 
 exit
 ```
 
-The `build` command above may take a while to complete. Once it's done, re-run `squid -k reconfigure` and
+The `index` command above may take a while to complete. Once it's done, re-run `squid -k reconfigure` and
 enjoy an internet without ads or tracking beacons.
 
 ### Content Interception
