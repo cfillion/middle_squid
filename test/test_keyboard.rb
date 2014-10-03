@@ -1,7 +1,7 @@
 require File.expand_path '../helper', __FILE__
 
 class TestKeyboard < MiniTest::Test
-  def test_input_line
+  def test_receive_line
     bag = []
 
     input = MiddleSquid::Backends::Keyboard.new nil, proc {|*args|
@@ -10,17 +10,19 @@ class TestKeyboard < MiniTest::Test
 
     input.receive_line 'hello world'
 
-    assert_equal [['hello world']], bag
+    assert_equal ['hello world'], bag.shift
+    assert_empty bag
   end
 
-  def test_input_fix_encoding
+  def test_encoding_fix
     bag = []
 
     input = MiddleSquid::Backends::Keyboard.new nil, proc {|line| bag << line }
 
     input.receive_line 'hello world'.force_encoding(Encoding::ASCII_8BIT)
 
-    assert_equal Encoding::UTF_8, bag[0].encoding
+    assert_equal Encoding::UTF_8, bag.shift.encoding
+    assert_empty bag
   end
 
   def test_input_eof
@@ -31,7 +33,7 @@ class TestKeyboard < MiniTest::Test
     end
   end
 
-  def test_input_buffer
+  def test_line_buffer
     bag = []
 
     input = MiddleSquid::Backends::Keyboard.new nil, proc {|*args| bag << args }
@@ -48,6 +50,30 @@ class TestKeyboard < MiniTest::Test
     input.receive_data 'd'
     input.receive_data "\n"
 
-    assert_equal [['hello world']], bag
+    assert_equal ['hello world'], bag.shift
+    assert_empty bag
+  end
+
+  def test_buffer_is_always_cleared
+    bag = []
+
+    input = MiddleSquid::Backends::Keyboard.new nil, proc {|*args|
+      bag << args
+      throw :skip
+    }
+
+    catch :skip do
+      input.receive_data 'a'
+      input.receive_data "\n"
+    end
+
+    catch :skip do
+      input.receive_data 'b'
+      input.receive_data "\n"
+    end
+
+    assert_equal ['a'], bag.shift
+    assert_equal ['b'], bag.shift
+    assert_empty bag
   end
 end
