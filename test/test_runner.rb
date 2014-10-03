@@ -9,13 +9,13 @@ class TestRunner < MiniTest::Test
       MiddleSquid::Runner.new fake_builder
     end
 
-    assert_equal 'MiddleSquid is not initialized. Did you call Builder#run in your configuration file?', error.message
+    assert_equal 'Invalid handler. Did you call Builder#run in your configuration file?', error.message
   end
 
   def test_run
     handler = proc { self }
 
-    custom_actions = { :world => proc { 'hello' } }
+    custom_actions = { :my_action => proc { self } }
 
     fake_adapter = MiniTest::Mock.new
     fake_adapter.expect :handler=, nil, [handler]
@@ -44,7 +44,7 @@ class TestRunner < MiniTest::Test
   end
 
   def verify_custom_actions
-    assert_equal 'hello', @obj.world
+    assert_equal @obj, @obj.my_action
 
     assert_raises NoMethodError do
       @obj.not_found

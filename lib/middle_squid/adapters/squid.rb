@@ -3,6 +3,7 @@ module MiddleSquid
   class Adapters::Squid < Adapter
     def start
       warn "[MiddleSquid] WARNING: STDOUT is a terminal. This command should be launched from squid." if STDOUT.tty?
+
       EM.open_keyboard Backends::Keyboard, method(:input)
     end
 
