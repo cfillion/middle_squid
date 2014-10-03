@@ -3,34 +3,14 @@ module MiddleSquid::Actions
   # @!group Predefined Actions
   #
 
-  # Send a custom reply to squid.
-  # The line format is documented at http://wiki.squid-cache.org/Features/Redirectors.
-  #
-  # @note
-  #   The channel ID will be automatically prepended if {Config.concurrency Config.concurrency} is enabled.
-  # @param line [String]
-  def action(line)
-    raise MiddleSquid::Action.new(line)
-  end
-
   # Allow the request to pass through. This is the default action.
   #
   # @example Whitelist a domain
   #   run proc {|uri, extras|
   #     accept if uri.host == 'github.com'
   #   }
-  # @raise [Action]
   def accept
-    action 'ERR'
-  end
-
-  # Make squid sad by ignoring his query.
-  #
-  # @note
-  #   Don't call this method unless you really know what you are doing!
-  # @raise [Action]
-  def drop
-    action nil
+    action :accept
   end
 
   # Redirect the browser to another URL.
@@ -41,9 +21,8 @@ module MiddleSquid::Actions
   #   }
   # @param url [String] the new url
   # @param status [Fixnum] HTTP status code (see http://tools.ietf.org/html/rfc7231#section-6.4)
-  # @raise [Action]
   def redirect_to(url, status: 301)
-    action "OK status=#{status} url=#{URI.escape url}"
+    action :redirect, status: status, url: url
   end
 
   # Serve another page in place of the requested one.
@@ -54,9 +33,8 @@ module MiddleSquid::Actions
   #     redirect_to 'http://webserver.lan/blocked.html' if uri.host == 'ads.google.com'
   #   }
   # @param url [String] the substitute url
-  # @raise [Action]
   def replace_by(url)
-    action "OK rewrite-url=#{URI.escape url}"
+    action :replace, url: url
   end
 
   # Hijack the request and generate a dynamic reply.
@@ -79,7 +57,6 @@ module MiddleSquid::Actions
   # @yieldparam req [Rack::Request] the browser request
   # @yieldparam res [Thin::AsyncResponse] the response to send back
   # @yieldreturn Rack triplet or anything else
-  # @raise [Action]
   # @see Helpers#download_like
   def intercept(&block)
     raise ArgumentError, 'no block given' unless block_given?
@@ -92,4 +69,9 @@ module MiddleSquid::Actions
   #
   # @!endgroup
   #
+
+  private
+  def action(name, options = {})
+    throw :action, [name, options]
+  end
 end

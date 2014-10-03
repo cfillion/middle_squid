@@ -58,25 +58,53 @@ class TestSquid < MiniTest::Test
     ], bag
   end
 
-  def test_output
-    bag = []
-
-    handler = proc { raise MiddleSquid::Action.new 'test' }
-    @std.handler = handler
-    @con.handler = handler
-
+  def test_concurrent_output
+    @con.handler = proc {}
     stdout, stderr = capture_io do
-      @std.input(SQUID_LINE)
+      @con.input CONCURRENT_LINE
     end
 
-    assert_equal "test\n", stdout
+    assert_equal "0 ERR\n", stdout
     assert_empty stderr
+  end
 
+  def test_accept
     stdout, stderr = capture_io do
-      @con.input(CONCURRENT_LINE)
+      @std.output :accept, {}
     end
 
-    assert_equal "0 test\n", stdout
+    assert_equal "ERR\n", stdout
     assert_empty stderr
+  end
+
+  def test_redirect
+    stdout, stderr = capture_io do
+      @std.output :redirect, {
+        :status => 418,
+        :url => 'http://test.com/hello world'
+      }
+    end
+
+    assert_equal "OK status=418 url=http://test.com/hello%20world\n", stdout
+    assert_empty stderr
+  end
+
+  def test_rewrite
+    stdout, stderr = capture_io do
+      @std.output :replace, {
+        :url => 'http://test.com/hello world'
+      }
+    end
+
+    assert_equal "OK rewrite-url=http://test.com/hello%20world\n", stdout
+    assert_empty stderr
+  end
+
+  def test_unsupported
+    error = assert_raises MiddleSquid::Error do
+      @std.output :test, {}
+    end
+
+    assert_equal 'unsupported action: test', error.message
   end
 end

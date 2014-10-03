@@ -5,7 +5,7 @@ class TestAdapter < MiniTest::Test
     @obj = MiddleSquid::Adapter.new
   end
   
-  def test_callback
+  def test_handler
     bag = []
 
     @obj.handler = proc {|*args| bag << args }
@@ -19,23 +19,21 @@ class TestAdapter < MiniTest::Test
     assert_equal 'http://test.com', uri.to_s
     assert_equal ['hello', 'world'], extras
 
-    default_action = bag.shift[0]
-    assert_equal 'ERR', default_action.line
+    assert_equal [:accept, {}], bag.shift # default action
 
     assert_empty bag
   end
 
   def test_output
-    action = MiddleSquid::Action.new 'test'
     bag = []
 
-    @obj.handler = proc { raise action }
+    @obj.handler = proc { throw :action, [:type, :options] }
 
     @obj.define_singleton_method(:output) { |*args| bag << args }
 
     @obj.handle 'http://test.com', []
 
-    assert_equal [action], bag.shift
+    assert_equal [:type, :options], bag.shift
     assert_empty bag
   end
 

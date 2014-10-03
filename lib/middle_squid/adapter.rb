@@ -10,10 +10,12 @@ module MiddleSquid
       uri = MiddleSquid::URI.parse url
       raise InvalidURIError if !uri || !uri.host
 
-      @handler.call uri, extras
-      raise Action.new 'ERR'
-    rescue Action => action
-      output action
+      action, options = catch :action do
+        @handler.call uri, extras
+        throw :action, [:accept, {}]
+      end
+
+      output action, options
     rescue Addressable::URI::InvalidURIError
       warn "[MiddleSquid] invalid URL received: '#{url}'"
     end
