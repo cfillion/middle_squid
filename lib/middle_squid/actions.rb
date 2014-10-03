@@ -84,9 +84,9 @@ module MiddleSquid::Actions
   def intercept(&block)
     raise ArgumentError, 'no block given' unless block_given?
 
-    token = @server.token_for block
+    token = server.token_for block
 
-    replace_by "http://#{@server.host}:#{@server.port}/#{token}"
+    replace_by "http://#{server.host}:#{server.port}/#{token}"
   end
 
   #

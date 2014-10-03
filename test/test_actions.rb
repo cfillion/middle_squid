@@ -60,7 +60,7 @@ class TestActions < MiniTest::Test
     mock.expect :token_for, 'qwfpgjluy', [Proc]
     mock.expect :host, '127.0.0.1'
     mock.expect :port, 8901
-    @obj.instance_eval { @server = mock }
+    @obj.define_singleton_method(:server) { mock }
 
     action = assert_raises MiddleSquid::Action do
       EM.run {
