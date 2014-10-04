@@ -1,80 +1,78 @@
-module MiddleSquid
-  module Helpers
-    #
-    # @!group Predefined Helpers
-    #
+module MiddleSquid::Helpers
+  #
+  # @!group Predefined Helpers
+  #
 
-    # Download a resource with the same the headers and body as a rack request.
-    #
-    # @note
-    #   Must be called inside an active fiber if used outside of {Actions#intercept}.
-    # @example Transparent Proxying
-    #   run proc {|uri, extras|
-    #     # you should use 'accept' instead of doing this
-    #     intercept {|req, res|
-    #       download_like req, uri
-    #     }
-    #   }
-    # @example Body Modification
-    #   run proc {|uri, extras|
-    #     intercept {|req, res|
-    #       status, headers, body = download_like req, uri
-    #       body.gsub! 'green', 'blue'
-    #
-    #       [status, headers, body]
-    #     }
-    #   }
-    # @example Error Handling
-    #   run proc {|uri, extras|
-    #     intercept {|req, res|
-    #       status, headers, body = download_like req, uri
-    #
-    #       if status.is_a? Fixnum
-    #         # ...
-    #       else
-    #         [500, {}, "Got an error: #{status}"]
-    #       end
-    #     }
-    #   }
-    # @param request [Rack::Request] the request to imitate
-    # @param uri [URI] the resource to fetch
-    # @return [Array] a rack triplet (status code, response headers and body)
-    # @return [Object] error code or message
-    # @see Actions#intercept
-    def download_like(request, uri)
-      fiber = Fiber.current
+  # Download a resource with the same the headers and body as a rack request.
+  #
+  # @note
+  #   Must be called inside an active fiber if used outside of {Actions#intercept}.
+  # @example Transparent Proxying
+  #   run lambda {|uri, extras|
+  #     # you should use 'accept' instead of doing this
+  #     intercept {|req, res|
+  #       download_like req, uri
+  #     }
+  #   }
+  # @example Body Modification
+  #   run lambda {|uri, extras|
+  #     intercept {|req, res|
+  #       status, headers, body = download_like req, uri
+  #       body.gsub! 'green', 'blue'
+  #
+  #       [status, headers, body]
+  #     }
+  #   }
+  # @example Error Handling
+  #   run lambda {|uri, extras|
+  #     intercept {|req, res|
+  #       status, headers, body = download_like req, uri
+  #
+  #       if status.is_a? Fixnum
+  #         # ...
+  #       else
+  #         [500, {}, "Got an error: #{status}"]
+  #       end
+  #     }
+  #   }
+  # @param request [Rack::Request] the request to imitate
+  # @param uri [URI] the resource to fetch
+  # @return [Array] a rack triplet (status code, response headers and body)
+  # @return [Object] error code or message
+  # @see Actions#intercept
+  def download_like(request, uri)
+    fiber = Fiber.current
 
-      method = request.request_method.downcase.to_sym
+    method = request.request_method.downcase.to_sym
 
-      headers = {'Content-Type' => request.env['CONTENT_TYPE']}
-      request.env.
-        select {|k| k.start_with? 'HTTP_' }.
-        each {|key, val| headers[key[5..-1]] = val }
+    headers = {'Content-Type' => request.env['CONTENT_TYPE']}
+    request.env.
+      select {|k| k.start_with? 'HTTP_' }.
+      each {|key, val| headers[key[5..-1]] = val }
+
+    headers.sanitize_headers!
+
+    options = {
+      :head => headers,
+      :body => request.body.read,
+    }
+
+    http = EM::HttpRequest.new(uri.to_s).send method, options
+    http.callback {
+      status = http.response_header.status
+      headers = http.response_header
+      body = http.response
 
       headers.sanitize_headers!
 
-      options = {
-        :head => headers,
-        :body => request.body.read,
-      }
+      fiber.resume [status, headers, body]
+    }
+    http.errback { fiber.resume http.error }
 
-      http = EM::HttpRequest.new(uri.to_s).send method, options
-      http.callback {
-        status = http.response_header.status
-        headers = http.response_header
-        body = http.response
-
-        headers.sanitize_headers!
-
-        fiber.resume [status, headers, body]
-      }
-      http.errback { fiber.resume http.error }
-
-      Fiber.yield
-    end
-
-    #
-    # @!endgroup
-    #
+    Fiber.yield
   end
+
+  #
+  # @!endgroup
+  #
 end

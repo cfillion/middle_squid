@@ -12,6 +12,12 @@ require 'thin'
 require 'thin/async'
 require 'thor'
 
+# Copyright (C) 2014 by Christian Fillion
+#
+# @see Builder Configuration syntax (DSL)
+# @see Actions List of predefined actions
+# @see Helpers List of predefined helpers
+# @see Adapters Available adapters
 module MiddleSquid
   require 'middle_squid/actions'
   require 'middle_squid/database'

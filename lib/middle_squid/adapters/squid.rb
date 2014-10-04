@@ -1,4 +1,16 @@
 module MiddleSquid
+  # Adapter for the {http://www.squid-cache.org Squid HTTP Proxy}.
+  #
+  # *Options:*
+  #
+  # concurrency::
+  #   Whether to expect a channel ID from Squid.
+  #
+  #   Enable this option if the concurrency option in set to > 0 in Squid's
+  #   {http://www.squid-cache.org/Doc/config/url_rewrite_children/ url_rewrite_children} directive.
+  #
+  # Extra data is configured in Squid with the {http://www.squid-cache.org/Doc/config/url_rewrite_extras/ url_rewrite_extras} directive.
+  #
   # @see http://wiki.squid-cache.org/Features/Redirectors
   class Adapters::Squid < Adapter
     def start

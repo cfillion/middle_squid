@@ -1,8 +1,21 @@
 module MiddleSquid
+  # Used internally to build the blacklist database.
+  #
+  # @see CLI#index <code>middle_squid index</code> command
   class Indexer
     include Database
     
-    attr_accessor :full_index, :entries, :append, :quiet
+    # @return [Boolean]
+    attr_accessor :append
+
+    # @return [Array<Symbol>]
+    attr_accessor :entries
+
+    # @return [Boolean]
+    attr_accessor :full_index
+
+    # @return [Boolean]
+    attr_accessor :quiet
 
     def initialize
       @append = false
@@ -22,6 +35,7 @@ module MiddleSquid
       }
     end
 
+    # @param list [Array<BlackList>]
     def blacklists=(list)
       @cats_in_use.clear
       @aliases.clear
@@ -37,6 +51,7 @@ module MiddleSquid
       @cats_in_use.uniq!
     end
 
+    # @param directories [Array<String>]
     def index(directories)
       if !@full_index && @cats_in_use.empty?
         warn 'ERROR: the loaded configuration does not use any blacklist'

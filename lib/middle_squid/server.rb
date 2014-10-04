@@ -1,4 +1,5 @@
 module MiddleSquid
+  # Manages the internal HTTP server.
   class Server
     DEFAULT_HOST = '127.0.0.1'.freeze
     DEFAULT_PORT = 0
@@ -33,6 +34,10 @@ module MiddleSquid
       @port = @host = nil
     end
 
+    # Create a temporary token.
+    #
+    # @param block [Proc] called when the token is used
+    # @return [String] random token
     def token_for(block)
       token = SecureRandom.uuid
       @tokens[token] = block

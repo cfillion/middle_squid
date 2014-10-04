@@ -11,6 +11,7 @@ class Hash
   DASH = '-'.freeze
   UNDERSCORE = '_'.freeze
 
+  # @return [Hash]
   def sanitize_headers!
     clean = {}
     each {|key, value|

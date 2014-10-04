@@ -6,7 +6,7 @@ module MiddleSquid::Actions
   # Allow the request to pass through. This is the default action.
   #
   # @example Whitelist a domain
-  #   run proc {|uri, extras|
+  #   run lambda {|uri, extras|
   #     accept if uri.host == 'github.com'
   #   }
   def accept
@@ -16,7 +16,7 @@ module MiddleSquid::Actions
   # Redirect the browser to another URL.
   #
   # @example Redirect google.com to duckduckgo.com
-  #   run proc {|uri, extras|
+  #   run lambda {|uri, extras|
   #     redirect_to "http://duckduckgo.com/#{uri.request_uri}" if uri.host == 'google.com'
   #   }
   # @param url [String] the new url
@@ -29,7 +29,7 @@ module MiddleSquid::Actions
   # Avoid in favor of {#redirect_to} when possible.
   #
   # @example Block google ads.
-  #   run proc {|uri, extras|
+  #   run lambda {|uri, extras|
   #     redirect_to 'http://webserver.lan/blocked.html' if uri.host == 'ads.google.com'
   #   }
   # @param url [String] the substitute url
@@ -49,7 +49,7 @@ module MiddleSquid::Actions
   #   With great power comes great responsibility.
   #   Please respect the privacy of your users.
   # @example Hello World
-  #   run proc {|uri, extras|
+  #   run lambda {|uri, extras|
   #     intercept {|req, res|
   #       [200, {}, 'Hello World']
   #     }

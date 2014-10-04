@@ -72,10 +72,10 @@ Finish with `sudo squid -k reconfigure`. Check `/var/log/squid/cache.log` for er
 
 MiddleSquid is configured by the ruby script specified in the command line by the `-C` or `--config-file` argument.
 
-The script must call the `run` method at the very end:
+The script must call the `run` method:
 
 ```ruby
-run proc {|uri, extras|
+run lambda {|uri, extras|
   # decide what to do with uri
 }
 ```
@@ -88,14 +88,14 @@ the uri to process and an array of extra data received from squid
 Write this in the file `/home/proxy/middle_squid_config.rb` we have created earlier:
 
 ```ruby
-run proc {|uri, extras|
+run lambda {|uri, extras|
   redirect_to 'http://duckduckgo.com' if uri.host =~ /google\.com$/
 }
 ```
 
 Run `sudo squid -k reconfigure` again to restart all MiddleSquid processes.
 You sould now be redirected to http://duckduckgo.com each time you visit
-http://google.com (the non-HTTPS version) using your Squid proxy.
+Google under your Squid proxy.
 
 ### Black Lists
 
@@ -113,14 +113,12 @@ Replace the previous configuration in `/home/proxy/middle_squid_config.rb`
 by this one:
 
 ```ruby
-config do |c|
-  c.database = '/home/proxy/blacklist.db'
-end
+database '/home/proxy/blacklist.db'
 
-adv     = BlackList.new 'adv'
-tracker = BlackList.new 'tracker'
+adv     = blacklist 'adv'
+tracker = blacklist 'tracker'
 
-run proc {|uri, extras|
+run lambda {|uri, extras|
   if adv.include? uri
     redirect_to 'http://your.webserver/block_pages/advertising.html'
   end
@@ -160,9 +158,10 @@ TODO
 MiddleSquid's documentation is hosted at
 [http://rubydoc.info/gems/middle_squid/MiddleSquid](http://rubydoc.info/gems/middle_squid/MiddleSquid).
 
+- [Configuration syntax (DSL)](http://rubydoc.info/gems/middle_squid/MiddleSquid/Builder)
 - [List of predefined actions](http://rubydoc.info/gems/middle_squid/MiddleSquid/Actions)
 - [List of predefined helpers](http://rubydoc.info/gems/middle_squid/MiddleSquid/Helpers)
-- [List of configuration settings](http://rubydoc.info/gems/middle_squid/MiddleSquid/Config)
+- [Available adapters](http://rubydoc.info/gems/middle_squid/MiddleSquid/Adapters)
 
 ## Changelog
 

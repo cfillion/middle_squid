@@ -1,10 +1,19 @@
 module MiddleSquid
+  # Used internally to start MiddleSquid and host the handler from your
+  # configuration file.
+  #
+  # @see Builder Configuration DSL
+  # @see CLI#start <code>middle_squid start</code> command
   class Runner
     include Actions
     include Helpers
 
+    # Returns the internal HTTP server.
+    #
+    # @return [Server]
     attr_reader :server
 
+    # @raise [Error] if the handler is undefined
     def initialize(builder)
       raise Error, 'Invalid handler. Did you call Builder#run in your configuration file?' unless builder.handler
 

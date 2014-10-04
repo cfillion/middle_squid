@@ -9,6 +9,11 @@ module MiddleSquid
 
     # <START>
     desc 'start', 'run the given configuration file'
+
+    # Runs the given configuration file.
+    #
+    # @example
+    #   middle_squid start -C middle_squid_config.rb
     def start
       config_file = File.expand_path options[:'config-file']
 
@@ -36,9 +41,9 @@ module MiddleSquid
 
     desc 'index SOURCES...', 'populate the database from one or more blacklists'
 
-    # Populate the database from one or more blacklists
+    # Populates the database from one or more blacklists
     #
-    # *Options:*
+    # *Flags:*
     #
     # [\-a, \--append, \--no-append]
     #   Whether to keep the entries already in the database.
@@ -50,7 +55,8 @@ module MiddleSquid
     #
     # [\--full, \--no-full]
     #   Whether to index all blacklist categories.
-    #   By default MiddleSquid will only index the categories used in the configuration script.
+    #   By default MiddleSquid will only read the categories registered
+    #   using {Builder#blacklist} in the configuration script.
     #
     #   Enable if you want to reuse the same database in multiple configurations
     #   set to use different blacklist categories and you need to index everything.
@@ -63,8 +69,9 @@ module MiddleSquid
     #
     #   <b>Enabled by default.</b>
     #
+    # @note {Builder#database} must be called in your configuration script in order to initialize the database.
     # @example
-    #   middle_squid index shalla -C middle_squid_config.rb
+    #   middle_squid index ShallaBlackList -C middle_squid_config.rb
     def index(*directories)
       config_file = File.expand_path options[:'config-file']
       directories.map! {|rel| File.expand_path rel }
