@@ -42,7 +42,7 @@ module MiddleSquid::Actions
   # change the behaviour of a website depending on the browser's headers or to
   # generate an entire virtual website using your favorite Rack framework.
   #
-  # The block is called inside a fiber, so you can easily perform asynchronous tasks.
+  # The block is called inside a fiber.
   # If the return value is a Rack triplet, it will be sent to the browser.
   #
   # @note
