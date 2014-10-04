@@ -138,6 +138,7 @@ module MiddleSquid
 
       @custom_actions[name] = block
     end
+    alias :define_helper :define_action
 
     # Takes any object that responds to the +call+ method with two arguments:
     # the uri to process and an array of extra data.

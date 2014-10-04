@@ -56,6 +56,10 @@ class TestBuilder < MiniTest::Test
     assert_equal({:hello => world}, @obj.custom_actions)
   end
 
+  def test_define_helper
+    assert_equal @obj.method(:define_helper), @obj.method(:define_action)
+  end
+
   def test_define_action_noblock
     error = assert_raises ArgumentError do
       @obj.define_action :hello
