@@ -8,7 +8,7 @@ module MiddleSquid
 
     def handle(url, extras)
       uri = MiddleSquid::URI.parse url
-      raise InvalidURIError if !uri || !uri.host
+      raise InvalidURIError, "invalid URL received: '#{url}'" if !uri || !uri.host
 
       action, options = catch :action do
         @handler.call uri, extras
@@ -16,8 +16,6 @@ module MiddleSquid
       end
 
       output action, options
-    rescue Addressable::URI::InvalidURIError
-      warn "[MiddleSquid] invalid URL received: '#{url}'"
     end
   end
 end

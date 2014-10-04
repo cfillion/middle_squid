@@ -37,18 +37,19 @@ class TestAdapter < MiniTest::Test
     assert_empty bag
   end
 
-  def test_invalid_urls
-    stdout, stderr = capture_io do
-      @obj.handle '', []
-      @obj.handle 'http://', []
+  def test_empty_url
+    error = assert_raises MiddleSquid::InvalidURIError do
+      @obj.handle nil, []
+    end
+
+    assert_equal "invalid URL received: ''", error.message
+  end
+
+  def test_invalid_url
+    error = assert_raises MiddleSquid::InvalidURIError do
       @obj.handle 'hello world', []
     end
 
-    assert_empty stdout
-    assert_equal [
-      "[MiddleSquid] invalid URL received: ''\n",
-      "[MiddleSquid] invalid URL received: 'http://'\n",
-      "[MiddleSquid] invalid URL received: 'hello world'\n",
-    ], stderr.lines
+    assert_equal "invalid URL received: 'hello world'", error.message
   end
 end
