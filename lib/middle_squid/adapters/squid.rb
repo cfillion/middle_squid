@@ -17,22 +17,27 @@ module MiddleSquid
     end
 
     def output(action, options)
-      line = @chan_id ? "#{@chan_id} " : ''
-
-      line << \
       case action
       when :accept
-        'ERR'
+        reply 'ERR'
       when :redirect
-        "OK status=#{options[:status]} url=#{URI.escape options[:url]}"
+        reply 'OK', status: options[:status], url: options[:url]
       when :replace
-        "OK rewrite-url=#{URI.escape options[:url]}"
+        reply 'OK', :'rewrite-url' => options[:url]
       else
         raise Error, "unsupported action: #{action}"
       end
+    end
 
-      puts line
-      STDOUT.flush
+    private
+    def reply(result, **kv_pairs)
+      parts = []
+      parts << @chan_id if @chan_id
+      parts << result
+      parts.concat kv_pairs.map {|k,v| "#{k}=#{URI.escape v.to_s}" }
+
+      $stdout.puts parts.join("\x20")
+      $stdout.flush
     end
   end
 end
