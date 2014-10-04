@@ -54,7 +54,7 @@ class TestIndexer < MiniTest::Test
       @obj.index [File.join(@path, 'empty')]
     end
 
-    assert_match 'indexing category/emptylist', stdout
+    assert_match 'indexing cat/emptylist', stdout
     assert_match 'reverting changes', stdout
 
     assert_match 'WARNING: nothing to commit', stderr
@@ -436,5 +436,22 @@ class TestIndexer < MiniTest::Test
 
     assert_empty stdout
     assert_match 'nothing to commit', stderr
+  end
+
+  def test_strip_spaces
+    stdout, stderr = capture_io do
+      @obj.index [File.join(@path, 'trailing_space')]
+    end
+
+    refute has_test_data?
+
+    domains = db.execute 'SELECT category, host FROM domains'
+    assert_empty domains
+
+    urls = db.execute 'SELECT category, host, path FROM urls'
+    assert_equal [
+      ['cat', '.before.com', 'path/'],
+      ['cat', '.after.com', 'path/'],
+    ], urls
   end
 end

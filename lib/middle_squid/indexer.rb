@@ -114,6 +114,9 @@ module MiddleSquid
     end
 
     def append_to(category, line)
+      # remove trailing whitespace
+      line.strip!
+
       # ignore regex lists
       return :ignored unless line[0] =~ /\w/
 
