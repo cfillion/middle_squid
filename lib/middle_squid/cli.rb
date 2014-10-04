@@ -1,17 +1,19 @@
 module MiddleSquid
   class CLI < Thor
+    package_name 'MiddleSquid'
+
     class_option :'config-file',
-      required: true,
-      desc:     'configuration file',
-      aliases:  '-C'
+      aliases:  '-C',
+      default: '~/middle_squid.rb',
+      desc:     'configuration file'
 
     # <START>
-    default_task :start
-    desc 'start', 'run the given configuration file (default)'
+    desc 'start', 'run the given configuration file'
     def start
       config_file = File.expand_path options[:'config-file']
 
       builder = Builder.from_file config_file
+
       MiddleSquid::Runner.new builder
     end
     # </START>
@@ -87,7 +89,6 @@ module MiddleSquid
 
     # <VERSION>
     desc 'version', 'show version and copyright'
-    option :'config-file', :required => false, :aliases => '-C'
     def version
       puts "MiddleSquid #{MiddleSquid::VERSION}"
       puts <<GPL
@@ -105,11 +106,5 @@ General Public License for more details.
 GPL
     end
     # </VERSION>
-
-    # <HELP>
-    desc 'help', 'show this message or describe a command'
-    option :'config-file', required: false, aliases: '-C'
-    def help(*args); super; end
-    # </HELP>
   end
 end

@@ -63,7 +63,7 @@ exec $GEM_HOME/bin/middle_squid $*
 Add this line to your `/etc/squid/squid.conf`:
 
 ```rc
-url_rewrite_program /usr/bin/sh /usr/local/bin/middle_squid_wrapper.sh -C /home/proxy/middle_squid_config.rb
+url_rewrite_program /usr/bin/sh /usr/local/bin/middle_squid_wrapper.sh start -C /home/proxy/middle_squid_config.rb
 ```
 
 Finish with `sudo squid -k reconfigure`. Check `/var/log/squid/cache.log` for errors.

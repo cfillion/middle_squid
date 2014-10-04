@@ -29,13 +29,14 @@ class TestCLI < MiniTest::Test
     end
   end
 
-  def test_start_missing_config
-    stdout, stderr = capture_io do
-      MiddleSquid::CLI.start %w[start]
+  def test_default_config
+    default = File.join Dir.home, 'middle_squid.rb'
+
+    error = assert_raises Errno::ENOENT do
+      MiddleSquid::CLI.start %W[start]
     end
 
-    assert_empty stdout
-    assert_match /no value provided for required options/i, stderr
+    assert_equal "No such file or directory @ rb_sysopen - #{default}", error.message
   end
 
   def test_index
@@ -97,7 +98,7 @@ class TestCLI < MiniTest::Test
       MiddleSquid::CLI.start %w[--help]
     end
 
-    assert_match /Commands:/, stdout
+    assert_match /MiddleSquid commands:/, stdout
     assert_match /Options:/, stdout
     assert_empty stderr
   end
