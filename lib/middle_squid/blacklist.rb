@@ -1,34 +1,26 @@
 # Use to query the blacklist database.
 # URIs can be matched by hostname (see {#include_domain?}), path (see {#include_url?}) or both (see {#include?}).
 #
-# Instances of this class must be created outside {MiddleSquid#run MiddleSquid#run}
-# (otherwise they would not be seen by the <code>middle_squid build</code> in {Config.minimal_indexing minimal indexing mode}).
+# Instances of this class should be created using {Builder#blacklist Builder#blacklist}
+# (otherwise they would not be seen by the <code>middle_squid index</code> unless the +--full+ flag is enabled).
 #
 # @example Block advertising
-#   adv = BlackList.new 'adv'
+#   adv = blacklist 'adv'
 #
-#   run proc {|uri, extras|
+#   run lambda {|uri, extras|
 #     do_something if adv.include? uri
 #   }
 # @example Group blacklists
-#   adv = BlackList.new 'adv'
-#   tracker = BlackList.new 'tracker'
+#   adv = blacklist 'adv'
+#   tracker = blacklist 'tracker'
 #
 #   group = [adv, tracker]
 #
-#   run proc {|uri, extras|
+#   run lambda {|uri, extras|
 #     do_something if group.any? {|bl| bl.include? uri }
 #   }
 class MiddleSquid::BlackList
   include MiddleSquid::Database
-
-  @@instances = []
-  @@too_late = false
-
-  # @return [Array]
-  def self.instances; @@instances; end
-
-  def self.deadline!; @@too_late = true; end
 
   # @return [String] the category passed to {#initialize}
   attr_reader :category
@@ -38,17 +30,9 @@ class MiddleSquid::BlackList
 
   # @param category [String]
   # @param aliases  [Array]
-  # @raise [MiddleSquid::Error] if the blacklist was created inside {MiddleSquid#run MiddleSquid#run}
   def initialize(category, aliases: [])
-    if @@too_late
-      raise MiddleSquid::Error,
-        'blacklists cannot be initialized inside the squid helper'
-    end
-
     @category = category
     @aliases = aliases
-
-    @@instances << self
   end
 
   # Whether the blacklist category contains the uri's hostname or an upper-level domain.

@@ -38,10 +38,6 @@ class TestBlackList < MiniTest::Test
     db.commit
   end
 
-  def teardown
-    MiddleSquid::BlackList.class_eval '@@instances.clear'
-  end
-
   def test_category
     bl = MiddleSquid::BlackList.new 'cat_name'
     assert_equal 'cat_name', bl.category
@@ -55,17 +51,6 @@ class TestBlackList < MiniTest::Test
   def test_aliases_custom
     bl = MiddleSquid::BlackList.new 'cat_name', aliases: ['name_cat']
     assert_equal ['name_cat'], bl.aliases
-  end
-
-  def test_instances
-    MiddleSquid::BlackList.class_eval '@@instances = []'
-
-    assert_empty MiddleSquid::BlackList.instances
-
-    first = MiddleSquid::BlackList.new 'neko'
-    second = MiddleSquid::BlackList.new 'inu'
-
-    assert_equal [first, second], MiddleSquid::BlackList.instances
   end
 
   def test_unmatch
@@ -200,18 +185,5 @@ class TestBlackList < MiniTest::Test
     group = [even, odd]
 
     assert group.any? {|bl| bl.include? uri }
-  end
-
-  def test_deadline
-    MiddleSquid::BlackList.deadline!
-
-    error = assert_raises MiddleSquid::Error do
-      MiddleSquid::BlackList.new 'test'
-    end
-
-    assert_equal 'blacklists cannot be initialized inside the squid helper', error.message
-  ensure
-    # reset the deadline for the other tests
-    MiddleSquid::BlackList.class_eval '@@too_late = false'
   end
 end
