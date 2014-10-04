@@ -57,7 +57,7 @@ class TestIndexer < MiniTest::Test
     assert_match 'indexing cat/emptylist', stdout
     assert_match 'reverting changes', stdout
 
-    assert_match 'WARNING: nothing to commit', stderr
+    assert_match 'ERROR: nothing to commit', stderr
 
     assert has_test_data?
   end
@@ -182,7 +182,7 @@ class TestIndexer < MiniTest::Test
     assert_match "reading #{File.join @path, '404'}", stdout
 
     assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
-    assert_match "WARNING: nothing to commit", stderr
+    assert_match "ERROR: nothing to commit", stderr
   end
 
   def test_multiple_not_found
@@ -316,7 +316,7 @@ class TestIndexer < MiniTest::Test
     assert has_test_data?
 
     assert_match 'found 3 ignored expression(s)', stdout
-    assert_match 'WARNING: nothing to commit', stderr
+    assert_match 'ERROR: nothing to commit', stderr
   end
 
   def test_aliases

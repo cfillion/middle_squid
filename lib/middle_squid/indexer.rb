@@ -170,7 +170,7 @@ module MiddleSquid
         puts 'committing changes'
         db.commit
       else
-        warn 'WARNING: nothing to commit'
+        warn 'ERROR: nothing to commit'
         puts 'reverting changes'
         db.rollback
       end
