@@ -60,10 +60,16 @@ exec $GEM_HOME/bin/middle_squid $*
 
 ### Step 4: Setup Squid
 
-Add this line to your `/etc/squid/squid.conf`:
+Add these lines to your `/etc/squid/squid.conf`:
 
-```rc
+```squidconf
 url_rewrite_program /usr/bin/sh /usr/local/bin/middle_squid_wrapper.sh start -C /home/proxy/middle_squid_config.rb
+
+# required to fix HTTPS sites (if SslBump is enabled)
+acl fix_ssl_rewrite method GET
+acl fix_ssl_rewrite method POST
+url_rewrite_access allow fix_ssl_rewrite
+url_rewrite_access deny all
 ```
 
 Finish with `sudo squid -k reconfigure`. Check `/var/log/squid/cache.log` for errors.
