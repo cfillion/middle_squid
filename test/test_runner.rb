@@ -18,7 +18,10 @@ class TestRunner < MiniTest::Test
     custom_actions = { :my_action => proc { self } }
 
     fake_adapter = MiniTest::Mock.new
-    fake_adapter.expect :handler=, nil, [handler]
+    fake_adapter.expect :handler=, nil do |wrapper|
+      assert_respond_to wrapper, :call
+      assert_instance_of MiddleSquid::Runner, wrapper.call
+    end
     fake_adapter.expect :start, nil, []
 
     fake_builder = Class.new

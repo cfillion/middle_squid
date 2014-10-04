@@ -8,14 +8,14 @@ module MiddleSquid
     def initialize(builder)
       raise Error, 'Invalid handler. Did you call Builder#run in your configuration file?' unless builder.handler
 
-      define_singleton_method :_handler, builder.handler
+      define_singleton_method :_handler_wrapper, builder.handler
 
       builder.custom_actions.each {|name, body|
         define_singleton_method name, body
       }
 
       adapter = builder.adapter
-      adapter.handler = proc {|*args| _handler *args }
+      adapter.handler = method :_handler_wrapper
 
       @server = Server.new
 
