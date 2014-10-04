@@ -10,12 +10,12 @@ module MiddleSquid
     # @return [String] the category passed to {#initialize}
     attr_reader :category
 
-    # @return [Array] the aliases passed to {#initialize}
+    # @return [Array<String>] the aliases passed to {#initialize}
     attr_reader :aliases
 
     # Returns a new instance of BlackList. Use {Builder#blacklist Builder#blacklist} instead.
     # @param category [String]
-    # @param aliases  [Array]
+    # @param aliases  [Array<String>]
     def initialize(category, aliases: [])
       @category = category
       @aliases = aliases

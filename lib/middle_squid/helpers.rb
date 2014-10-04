@@ -3,10 +3,10 @@ module MiddleSquid::Helpers
   # @!group Predefined Helpers
   #
 
-  # Download a resource with the same the headers and body as a rack request.
+  # Download a resource with the same headers and body as a rack request.
   #
   # @note
-  #   Must be called inside an active fiber if used outside of {Actions#intercept}.
+  #   This method must be called inside an active fiber. {Actions#intercept} does it automatically.
   # @example Transparent Proxying
   #   run lambda {|uri, extras|
   #     # you should use 'accept' instead of doing this
@@ -18,6 +18,7 @@ module MiddleSquid::Helpers
   #   run lambda {|uri, extras|
   #     intercept {|req, res|
   #       status, headers, body = download_like req, uri
+  #
   #       body.gsub! 'green', 'blue'
   #
   #       [status, headers, body]
@@ -31,7 +32,7 @@ module MiddleSquid::Helpers
   #       if status.is_a? Fixnum
   #         # ...
   #       else
-  #         [500, {}, "Got an error: #{status}"]
+  #         [500, {}, "Something went wrong: #{status}"]
   #       end
   #     }
   #   }
@@ -58,6 +59,7 @@ module MiddleSquid::Helpers
     }
 
     http = EM::HttpRequest.new(uri.to_s).send method, options
+
     http.callback {
       status = http.response_header.status
       headers = http.response_header
@@ -67,6 +69,7 @@ module MiddleSquid::Helpers
 
       fiber.resume [status, headers, body]
     }
+
     http.errback { fiber.resume http.error }
 
     Fiber.yield

@@ -1,6 +1,9 @@
 module MiddleSquid::Database
   @@db = nil
 
+  # Setup the database. Use {Builder#database} instead.
+  #
+  # @param path [String]
   def self.setup(path)
     @@db.close if @@db
 
@@ -35,6 +38,7 @@ module MiddleSquid::Database
     @@db.execute 'PRAGMA journal_mode=WAL'
   end
 
+  # @return [SQLite3::Database]
   def db
     raise "The database is not initialized. Did you call Builder#database in your configuration file?" unless @@db
 

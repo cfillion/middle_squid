@@ -1,4 +1,6 @@
 module MiddleSquid
+  # Provides distinguishable host and path for the blacklists.
+  #
   # @see http://rubydoc.info/gems/addressable/Addressable/URI
   class URI < Addressable::URI
     DOT   = '.'.freeze

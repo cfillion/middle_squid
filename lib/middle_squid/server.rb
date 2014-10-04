@@ -36,7 +36,7 @@ module MiddleSquid
 
     # Create a temporary token.
     #
-    # @param block [Proc] called when the token is used
+    # @param block [#call] called when the token is requested
     # @return [String] random token
     def token_for(block)
       token = SecureRandom.uuid

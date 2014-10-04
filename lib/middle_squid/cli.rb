@@ -8,7 +8,7 @@ module MiddleSquid
       desc:     'configuration file'
 
     # <START>
-    desc 'start', 'run the given configuration file'
+    desc 'start', 'Run the given configuration file'
 
     # Runs the given configuration file.
     #
@@ -39,7 +39,7 @@ module MiddleSquid
     option :urls,    type: :boolean, default: true,
       desc: 'index urls lists'
 
-    desc 'index SOURCES...', 'populate the database from one or more blacklists'
+    desc 'index SOURCES...', 'Populate the database from one or more blacklists'
 
     # Populates the database from one or more blacklists
     #
@@ -95,7 +95,9 @@ module MiddleSquid
     # </INDEX>
 
     # <VERSION>
-    desc 'version', 'show version and copyright'
+    desc 'version', 'Show current version and copyright notice'
+
+    # Shows MiddleSquid's version and copyright notice.
     def version
       puts "MiddleSquid #{MiddleSquid::VERSION}"
       puts <<GPL

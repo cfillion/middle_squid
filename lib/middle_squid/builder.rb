@@ -54,9 +54,10 @@ module MiddleSquid
       obj
     end
 
-    # Select the active adapter. By default {Adapters::Squid} will be used.
+    # Select the active adapter.
+    # By default {Adapters::Squid} with no options will be used.
     #
-    # @example Squid in concurrent mode
+    # @example Squid in concurrency mode
     #   use Adapters::Squid, concurrency: true
     # @param adapter [Class]
     # @param options [Hash] adapter configuration
@@ -75,6 +76,10 @@ module MiddleSquid
     #
     # Run {CLI#index middle_squid index} to add your blacklists to the database.
     #
+    # @example
+    #   database '/home/proxy/blacklist.db'
+    #
+    #   run lambda {|uri, extras| }
     # @param path [String] path to the SQLite database
     def database(path)
       Database.setup path
@@ -134,8 +139,6 @@ module MiddleSquid
       @custom_actions[name] = block
     end
 
-    # Start the configured adapter and the internal server.
-    #
     # Takes any object that responds to the +call+ method with two arguments:
     # the uri to process and an array of extra data.
     #

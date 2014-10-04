@@ -1,6 +1,6 @@
 module MiddleSquid
-  # Used internally to start MiddleSquid and host the handler from your
-  # configuration file.
+  # Used internally to start the configured adapter and the internal HTTP server.
+  # The handler passed to {Builder#run} will be called in this context.
   #
   # @see Builder Configuration DSL
   # @see CLI#start <code>middle_squid start</code> command
