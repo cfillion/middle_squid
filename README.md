@@ -42,7 +42,7 @@ sudo usermod --home /home/proxy proxy
 sudo su - proxy
 
 gem install middle_squid
-echo '# the configuration will be here' > middle_squid_config.rb
+echo 'run lambda {|uri, extras| }' > middle_squid_config.rb
 
 exit
 ```
