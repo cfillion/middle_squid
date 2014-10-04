@@ -24,7 +24,13 @@ class TestAdapter < MiniTest::Test
     assert_empty bag
   end
 
-  def test_output
+  def test_default_output
+    assert_raises NotImplementedError do
+      @obj.output :accept, {}
+    end
+  end
+
+  def test_overridden_output
     bag = []
 
     @obj.handler = proc { throw :action, [:type, :options] }

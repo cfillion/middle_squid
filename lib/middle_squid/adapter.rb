@@ -1,6 +1,6 @@
 module MiddleSquid
   class Adapter
-    attr_writer :handler
+    attr_accessor :handler
 
     def initialize(options = {})
       @options = options
@@ -16,6 +16,26 @@ module MiddleSquid
       end
 
       output action, options
+    end
+
+    # Pass an action to an underlying software.
+    #
+    # accept::
+    #   (no options)
+    #
+    # redirect::
+    #   Options:
+    #   - +status+ [+Fixnum+]
+    #   - +url+ [+String+]
+    #
+    # replace::
+    #   Options:
+    #   - +url+ [+String+]
+    #
+    # @param action [Symbol]
+    # @param options [Hash]
+    def output(action, options)
+      raise NotImplementedError
     end
   end
 end
