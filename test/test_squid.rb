@@ -1,8 +1,7 @@
 require File.expand_path '../helper', __FILE__
 
 class TestSquid < MiniTest::Test
-  SQUID_LINE = 'http://cfillion.tk/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'.freeze
-  HTTPS_LINE = 'cfillion.tk:443 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128'.freeze
+  SQUID_LINE = 'http://cfillion.tk/ 127.0.0.1/localhost.localdomain - GET myip=127.0.0.1 myport=3128 test=hello%20world'.freeze
   CONCURRENT_LINE = "0 #{SQUID_LINE}".freeze
 
   make_my_diffs_pretty!
@@ -49,7 +48,8 @@ class TestSquid < MiniTest::Test
       '-',
       'GET',
       'myip=127.0.0.1',
-      'myport=3128'
+      'myport=3128',
+      'test=hello world',
     ]
 
     assert_equal [

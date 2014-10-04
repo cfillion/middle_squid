@@ -13,6 +13,8 @@ module MiddleSquid
       @chan_id = @options[:concurrency] ? parts.shift : nil
       url, *extras = parts
 
+      extras.map! {|str| URI.unescape str }
+
       handle url, extras
     end
 
