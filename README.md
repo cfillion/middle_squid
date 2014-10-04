@@ -2,7 +2,7 @@ This is a work in progress.
 
 # MiddleSquid
 
-[![Gem Version](https://badge.fury.io/rb/middle_squid.png)](http://badge.fury.io/rb/middle_squid)
+[![Gem Version](https://badge.fury.io/rb/middle_squid.svg)](http://badge.fury.io/rb/middle_squid)
 [![Build Status](https://travis-ci.org/cfillion/middle_squid.svg?branch=master)](https://travis-ci.org/cfillion/middle_squid)
 [![Code Climate](https://codeclimate.com/github/cfillion/middle_squid/badges/gpa.svg)](https://codeclimate.com/github/cfillion/middle_squid)
 
