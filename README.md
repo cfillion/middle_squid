@@ -12,7 +12,7 @@ MiddleSquid is a redirector, url mangler and webpage interceptor for the squid H
 
 **Features**
 
-- Configuration is done by writing a simple ruby script
+- Configuration is done by writing a ruby script
 - Supports plain-text domains/urls blacklists
 - Can intercept and modify any HTTP request or response
 - Works with HTTPS
