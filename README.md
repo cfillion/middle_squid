@@ -4,7 +4,9 @@ This is a work in progress.
 
 [![Gem Version](https://badge.fury.io/rb/middle_squid.svg)](http://badge.fury.io/rb/middle_squid)
 [![Build Status](https://travis-ci.org/cfillion/middle_squid.svg?branch=master)](https://travis-ci.org/cfillion/middle_squid)
+[![Dependency Status](https://gemnasium.com/cfillion/middle_squid.svg)](https://gemnasium.com/cfillion/middle_squid)
 [![Code Climate](https://codeclimate.com/github/cfillion/middle_squid/badges/gpa.svg)](https://codeclimate.com/github/cfillion/middle_squid)
+[![Coverage Status](https://img.shields.io/coveralls/cfillion/middle_squid.svg)](https://coveralls.io/r/cfillion/middle_squid)
 
 MiddleSquid is a redirector, url mangler and webpage interceptor for the squid HTTP proxy.
 
