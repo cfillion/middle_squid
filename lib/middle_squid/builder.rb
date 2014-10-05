@@ -62,7 +62,7 @@ module MiddleSquid
     # @param adapter [Class]
     # @param options [Hash] adapter configuration
     # @return [Adapter]
-    # @raise [ArgumentError] if +adapter+ is not a subclass of {Adapter}
+    # @raise [ArgumentError] if the adapter is not a subclass of {Adapter}
     # @see Adapters List of predefined adapters
     def use(adapter, **options)
       raise ArgumentError, 'Not an adapter.' unless adapter < Adapter
@@ -141,14 +141,14 @@ module MiddleSquid
     alias :define_helper :define_action
 
     # Takes any object that responds to the +call+ method with two arguments:
-    # the uri to process and an array of extra data.
+    # the URI to process and an array of extra data.
     #
     # @example
     #   run lambda {|uri, extras|
     #     # executed when the adapter has received a query from an underlying software (eg. Squid)
     #   }
     # @param handler [#call<URI, Array>]
-    # @raise [ArgumentError] if +handler+ does not respond to +#call+
+    # @raise [ArgumentError] if the handler does not respond to +#call+
     # @see Runner Execution context (Runner)
     def run(handler)
       raise ArgumentError, 'the handler must respond to #call' unless handler.respond_to? :call

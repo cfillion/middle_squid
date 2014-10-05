@@ -28,7 +28,7 @@ module MiddleSquid::Actions
   # Serve another page in place of the requested one.
   # Avoid in favor of {#redirect_to} when possible.
   #
-  # @example Block google ads.
+  # @example Block Google advertisements
   #   run lambda {|uri, extras|
   #     redirect_to 'http://webserver.lan/blocked.html' if uri.host == 'ads.google.com'
   #   }

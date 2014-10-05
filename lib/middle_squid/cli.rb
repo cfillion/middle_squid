@@ -41,7 +41,7 @@ module MiddleSquid
 
     desc 'index SOURCES...', 'Populate the database from one or more blacklists'
 
-    # Populates the database from one or more blacklists
+    # Populates the database from one or more blacklists.
     #
     # *Flags:*
     #

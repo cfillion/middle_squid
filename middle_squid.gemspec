@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.version       = MiddleSquid::VERSION
   spec.authors       = ['Christian Fillion']
   spec.email         = ['middle_squid@cfillion.tk']
-  spec.summary       = 'A redirector, url mangler and webpage interceptor for the squid HTTP proxy'
+  spec.summary       = 'A redirector, url mangler and webpage interceptor for the Squid HTTP proxy'
   spec.homepage      = 'https://github.com/cfillion/middle_squid'
   spec.license       = 'GPL-3.0+'
 

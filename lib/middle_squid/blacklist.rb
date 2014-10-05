@@ -21,7 +21,7 @@ module MiddleSquid
       @aliases = aliases
     end
 
-    # Whether the blacklist category contains the uri's hostname or an upper-level domain.
+    # Whether the blacklist category contains the URI's hostname or an upper-level domain.
     #
     # Rules to the <code>www</code> subdomain match any subdomains.
     #
@@ -30,7 +30,7 @@ module MiddleSquid
     #   - http://sub.domain.com/...
     #   - http://second.sub.domain.com/...
     #   - http://infinite.level.of.sub.domain.com/...
-    # @param uri [URI] the uri to search
+    # @param uri [URI] the URI to search
     def include_domain?(uri)
       !!db.get_first_value(
         "SELECT 1 FROM domains WHERE category = ? AND ? LIKE '%' || host LIMIT 1",
@@ -38,7 +38,7 @@ module MiddleSquid
       )
     end
 
-    # Whether the blacklist category contains the uri. Matches by partial domain (like {#include_domain?}) and path. The query string is ignored.
+    # Whether the blacklist category contains the URI. Matches by partial domain (like {#include_domain?}) and path. The query string is ignored.
     #
     # Rules to index files (index.html, Default.aspx and friends) match the whole directory.
     #
@@ -48,7 +48,7 @@ module MiddleSquid
     #   - http://domain.com/dummy/../path
     #   - http://domain.com/path/extra_path
     #   - http://domain.com/path?query=string
-    # @param uri [URI] the uri to search
+    # @param uri [URI] the URI to search
     def include_url?(uri)
       !!db.get_first_value(
         "SELECT 1 FROM urls WHERE category = ? AND ? LIKE '%' || host AND ? LIKE path || '%' LIMIT 1",

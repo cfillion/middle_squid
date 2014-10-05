@@ -8,7 +8,7 @@ This is a work in progress.
 [![Code Climate](https://codeclimate.com/github/cfillion/middle_squid/badges/gpa.svg)](https://codeclimate.com/github/cfillion/middle_squid)
 [![Coverage Status](https://img.shields.io/coveralls/cfillion/middle_squid.svg)](https://coveralls.io/r/cfillion/middle_squid?branch=master)
 
-MiddleSquid is a redirector, url mangler and webpage interceptor for the squid HTTP proxy.
+MiddleSquid is a redirector, url mangler and webpage interceptor for the Squid HTTP proxy.
 
 **Features**
 
@@ -21,7 +21,7 @@ MiddleSquid is a redirector, url mangler and webpage interceptor for the squid H
 ## Installation & Setup
 
 Assuming [Squid](http://www.squid-cache.org/) is installed and running as user 'proxy'.
-These instructions were written for [ArchLinux](https://www.archlinux.org/).
+These instructions were written for [Arch Linux](https://www.archlinux.org/).
 Some adaptation to your favorite operating system may be necessary, at your
 discretion.
 
@@ -49,7 +49,7 @@ echo 'run lambda {|uri, extras| }' > middle_squid_config.rb
 exit
 ```
 
-### Step 3: Create launcher script
+### Step 3: Create a launcher script
 
 Create the file `/usr/local/bin/middle_squid_wrapper.sh`:
 
@@ -89,7 +89,7 @@ run lambda {|uri, extras|
 ```
 
 The argument must be an object that responds to the `call` method and taking two arguments:
-the uri to process and an array of extra data received from squid
+the URI to process and an array of extra data received from squid
 (see url_rewrite_extras in
 [squid's documentation](http://www.squid-cache.org/Doc/config/url_rewrite_extras/)).
 
@@ -97,12 +97,12 @@ Write this in the file `/home/proxy/middle_squid_config.rb` we have created earl
 
 ```ruby
 run lambda {|uri, extras|
-  redirect_to 'http://duckduckgo.com' if uri.host.end_with? '.google.com'
+  redirect_to 'http://duckduckgo.com' if uri.host.end_with? 'google.com'
 }
 ```
 
 Run `sudo squid -k reconfigure` again to restart all MiddleSquid processes.
-You sould now be redirected to http://duckduckgo.com each time you visit
+You should now be redirected to http://duckduckgo.com each time you visit
 Google under your Squid proxy.
 
 ### Black Lists
@@ -114,7 +114,7 @@ services that are constantly watching your whereabouts.
 MiddleSquid can scan any black list collection distributed in plain-text format
 and compatible with SquidGuard or Dansguardian, such as:
 
-- [Shalla's Blacklists](http://www.shallalist.de/) (free for personnal use)
+- [Shalla's Blacklists](http://www.shallalist.de/) (free for personal use)
 - [URLBlackList.com](http://www.urlblacklist.com/) (commercial)
 
 Replace the previous configuration in `/home/proxy/middle_squid_config.rb`
@@ -160,11 +160,11 @@ enjoy an internet without ads or tracking beacons.
 ### Content Interception
 
 MiddleSquid can also intercept the client's requests and modify the data sent to the
-browser. Let's translate a few clickbait headlines on BuzzFeed
+browser. Let's translate a few click-bait headlines on BuzzFeed
 (check out [Downworthy](http://downworthy.snipe.net/) while you are at it):
 
 ```ruby
-CLICKBAITS = {
+CLICK_BAITS = {
   'Literally' => 'Figuratively',
   'Mind-Blowing' => 'Painfully Ordinary',
   'Will Blow Your Mind' => 'Might Perhaps Mildly Entertain You For a Moment',
@@ -178,7 +178,7 @@ define_action :translate do |uri|
     content_type = headers['Content-Type'].to_s
 
     if content_type.include? 'text/html'
-      CLICKBAITS.each {|before, after|
+      CLICK_BAITS.each {|before, after|
         body.gsub! before, after
       }
     end
@@ -216,7 +216,8 @@ First public release.
 
 ## Future Plans
 
-- Find out why HTTPS is not working everytime under Squid without the ACL hack.
+- Find out why HTTPS is not always working under Squid without the ACL hack.
+- Write new adapters for other proxies or softwares.
 
 ## Contributing
 

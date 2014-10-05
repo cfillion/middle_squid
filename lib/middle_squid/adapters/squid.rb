@@ -6,7 +6,7 @@ module MiddleSquid
   # concurrency::
   #   Whether to expect a channel ID from Squid.
   #
-  #   Enable this option if the concurrency option in set to > 0 in Squid's
+  #   Enable this option if the concurrency option is set to > 0 in Squid's
   #   {http://www.squid-cache.org/Doc/config/url_rewrite_children/ url_rewrite_children} directive.
   #
   # Extra data is configured in Squid with the {http://www.squid-cache.org/Doc/config/url_rewrite_extras/ url_rewrite_extras} directive.

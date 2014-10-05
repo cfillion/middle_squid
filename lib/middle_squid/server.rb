@@ -34,7 +34,7 @@ module MiddleSquid
       @port = @host = nil
     end
 
-    # Create a temporary token.
+    # Creates a temporary token.
     #
     # @param block [#call] called when the token is requested
     # @return [String] random token
