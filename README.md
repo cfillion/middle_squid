@@ -95,7 +95,7 @@ Write this in the file `/home/proxy/middle_squid_config.rb` we have created earl
 
 ```ruby
 run lambda {|uri, extras|
-  redirect_to 'http://duckduckgo.com' if uri.host =~ /google\.com$/
+  redirect_to 'http://duckduckgo.com' if uri.host.end_with? '.google.com'
 }
 ```
 
@@ -157,7 +157,44 @@ enjoy an internet without ads or tracking beacons.
 
 ### Content Interception
 
-TODO
+MiddleSquid can also intercept the client's requests and modify the data sent to the
+browser. Let's translate a few clickbait headlines on BuzzFeed
+(check out [Downworthy](http://downworthy.snipe.net/) while you are at it):
+
+```ruby
+CLICKBAITS = {
+  'Literally' => 'Figuratively',
+  'Mind-Blowing' => 'Painfully Ordinary',
+  'Will Blow Your Mind' => 'Might Perhaps Mildly Entertain You For a Moment',
+  # ...
+}.freeze
+
+define_action :translate do |uri|
+  intercept {|req, res|
+    status, headers, body = download_like req, uri
+
+    content_type = headers['Content-Type'].to_s
+
+    if content_type.include? 'text/html'
+      CLICKBAITS.each {|before, after|
+        body.gsub! before, after
+      }
+    end
+
+    [status, headers, body]
+  }
+end
+
+run lambda {|uri, extras|
+  if uri.host == 'www.buzzfeed.com'
+    translate uri
+  end
+}
+```
+
+Don't use this feature unless you have the permission from all your users to do so.
+This indeed constitutes a man-in-the-middle attack and should be used with
+moderation.
 
 ## Documentation
 
