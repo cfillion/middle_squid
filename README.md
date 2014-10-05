@@ -136,7 +136,7 @@ run lambda {|uri, extras|
 ```
 
 Next we have to download a blacklist and ask MiddleSquid to index its content
-in the database for fast access.
+in the database for fast access:
 
 ```sh
 sudo su - proxy
@@ -177,7 +177,7 @@ First public release.
 
 ## Future Plans
 
-TODO
+- Find out why HTTPS is not working everytime under Squid without the ACL hack.
 
 ## Contributing
 

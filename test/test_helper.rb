@@ -68,8 +68,9 @@ class TestHelpers < MiniTest::Test
       'rack.input' => StringIO.new
 
     assert_requested stub
-    assert_equal 'WebMock timeout error', status
-    assert_nil headers
-    assert_nil body
+
+    assert_equal 520, status
+    assert_empty headers
+    assert_equal '[MiddleSquid] WebMock timeout error', body
   end
 end

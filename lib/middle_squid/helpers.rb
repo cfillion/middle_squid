@@ -19,21 +19,13 @@ module MiddleSquid::Helpers
   #     intercept {|req, res|
   #       status, headers, body = download_like req, uri
   #
-  #       body.gsub! 'green', 'blue'
+  #       content_type = headers['Content-Type'].to_s
+  #
+  #       if content_type.include? 'text/html'
+  #         body.gsub! 'green', 'blue'
+  #       end
   #
   #       [status, headers, body]
-  #     }
-  #   }
-  # @example Error Handling
-  #   run lambda {|uri, extras|
-  #     intercept {|req, res|
-  #       status, headers, body = download_like req, uri
-  #
-  #       if status.is_a? Fixnum
-  #         # ...
-  #       else
-  #         [500, {}, "Something went wrong: #{status}"]
-  #       end
   #     }
   #   }
   # @param request [Rack::Request] the request to imitate
@@ -70,7 +62,9 @@ module MiddleSquid::Helpers
       fiber.resume [status, headers, body]
     }
 
-    http.errback { fiber.resume http.error }
+    http.errback {
+      fiber.resume [520, {}, "[MiddleSquid] #{http.error}"]
+    }
 
     Fiber.yield
   end
