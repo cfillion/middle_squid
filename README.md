@@ -1,5 +1,3 @@
-This is a work in progress.
-
 # MiddleSquid
 
 [![Gem Version](https://badge.fury.io/rb/middle_squid.svg)](http://badge.fury.io/rb/middle_squid)
