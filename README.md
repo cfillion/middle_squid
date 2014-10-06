@@ -147,7 +147,7 @@ tar xzf shallalist.tar.gz
 mv BL ShallaBlackList
 
 # Construct the blacklist database
-/usr/local/bin/middle_squid_wrapper.sh index ShallaBlackList -C /etc/squid/middle_squid.rb
+/usr/local/bin/middle_squid_wrapper.sh index ShallaBlackList -C /home/proxy/middle_squid_config.rb
 
 exit
 ```
