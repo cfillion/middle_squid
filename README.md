@@ -208,7 +208,7 @@ MiddleSquid's documentation is hosted at
 
 ## Changelog
 
-### v0.1 (00/00/2014)
+### v1.0 (2014-10-05)
 
 First public release.
 
