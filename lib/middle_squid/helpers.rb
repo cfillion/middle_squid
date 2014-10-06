@@ -62,7 +62,11 @@ module MiddleSquid::Helpers
     }
 
     http.errback {
-      fiber.resume [520, {}, "[MiddleSquid] #{http.error}"]
+      fiber.resume [
+        520,
+        {'Content-Type' => 'text/plain'},
+        "[MiddleSquid] #{http.error}"
+      ]
     }
 
     Fiber.yield

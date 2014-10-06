@@ -70,7 +70,7 @@ class TestHelpers < MiniTest::Test
     assert_requested stub
 
     assert_equal 520, status
-    assert_empty headers
+    assert_equal({'Content-Type' => 'text/plain'}, headers)
     assert_equal '[MiddleSquid] WebMock timeout error', body
   end
 end
