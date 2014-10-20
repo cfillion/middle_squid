@@ -42,22 +42,22 @@ class TestIndexer < MiniTest::Test
       @obj.index [File.join(@path, 'black')]
     end
 
-    assert_equal "nothing to do in minimal indexing mode\n", stdout
-
-    assert_match 'ERROR', stderr
+    assert_equal <<-OUT, stderr
+ERROR: the loaded configuration does not use any blacklist
+nothing to do in minimal indexing mode
+    OUT
 
     assert has_test_data?
   end
 
-  def test_empty_rollback
+  def test_empty_file
     stdout, stderr = capture_io do
       @obj.index [File.join(@path, 'empty')]
     end
 
-    assert_match 'indexing cat/emptylist', stdout
-    assert_match 'reverting changes', stdout
-
+    assert_match 'indexing cat/emptylist', stderr
     assert_match 'ERROR: nothing to commit', stderr
+    assert_match 'reverting changes', stderr
 
     assert has_test_data?
   end
@@ -84,18 +84,18 @@ class TestIndexer < MiniTest::Test
       ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png/'],
     ], urls
 
-    assert_match 'indexing ads/urls', stdout
-    assert_match 'indexing ads/domains', stdout
-    assert_match 'indexing tracker/urls', stdout
-    assert_match 'indexing tracker/domains', stdout
-    assert_match 'indexed 2 categorie(s): ["ads", "tracker"]', stdout
-    assert_match 'found 4 domain(s)', stdout
-    assert_match 'found 3 url(s)', stdout
-    assert_match 'found 0 duplicate(s)', stdout
-    assert_match 'found 0 ignored expression(s)', stdout
-    assert_match 'committing changes', stdout
-
-    assert_empty stderr
+    assert_match 'indexing ads/urls', stderr
+    assert_match 'indexing ads/urls', stderr
+    assert_match 'indexing ads/domains', stderr
+    assert_match 'indexing ads/domains', stderr
+    assert_match 'indexing tracker/urls', stderr
+    assert_match 'indexing tracker/domains', stderr
+    assert_match 'indexed 2 categorie(s): ["ads", "tracker"]', stderr
+    assert_match 'found 4 domain(s)', stderr
+    assert_match 'found 3 url(s)', stderr
+    assert_match 'found 0 duplicate(s)', stderr
+    assert_match 'found 0 ignored expression(s)', stderr
+    assert_match 'committing changes', stderr
   end
 
   def test_index_multiple
@@ -128,12 +128,10 @@ class TestIndexer < MiniTest::Test
       ['isp', '.telus.com', 'content/internet/'],
     ], urls
 
-    assert_match 'indexed 4 categorie(s): ["ads", "tracker", "isp", "news"]', stdout
-    assert_match 'found 8 domain(s)', stdout
-    assert_match 'found 4 url(s)', stdout
-    assert_match 'found 0 duplicate(s)', stdout
-
-    assert_empty stderr
+    assert_match 'indexed 4 categorie(s): ["ads", "tracker", "isp", "news"]', stderr
+    assert_match 'found 8 domain(s)', stderr
+    assert_match 'found 4 url(s)', stderr
+    assert_match 'found 0 duplicate(s)', stderr
   end
 
   def test_ignore_subdirectories
@@ -141,7 +139,8 @@ class TestIndexer < MiniTest::Test
       @obj.index [File.join(@path, 'subdirectory')]
     end
 
-    refute_match 'cat/ignore', stdout
+    refute_match 'cat/ignore', stderr
+
     assert has_test_data?
   end
 
@@ -166,10 +165,8 @@ class TestIndexer < MiniTest::Test
       ['ads', '.google.com', 'adsense/'],
     ], urls
 
-    refute_match 'tracker', stdout
-    assert_match 'indexed 1 categorie(s): ["ads"]', stdout
-
-    assert_empty stderr
+    refute_match 'tracker', stderr
+    assert_match 'indexed 1 categorie(s): ["ads"]', stderr
   end
 
   def test_not_found
@@ -179,7 +176,7 @@ class TestIndexer < MiniTest::Test
 
     assert has_test_data?
 
-    assert_match "reading #{File.join @path, '404'}", stdout
+    assert_match "reading #{File.join @path, '404'}", stderr
 
     assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
     assert_match "ERROR: nothing to commit", stderr
@@ -195,8 +192,8 @@ class TestIndexer < MiniTest::Test
 
     refute has_test_data?
 
-    assert_match "reading #{File.join @path, '404'}", stdout
-    assert_match "reading #{File.join @path, 'gray'}", stdout
+    assert_match "reading #{File.join @path, '404'}", stderr
+    assert_match "reading #{File.join @path, 'gray'}", stderr
 
     assert_match "WARNING: #{File.join @path, '404'}: no such directory\n", stderr
   end
@@ -290,10 +287,8 @@ class TestIndexer < MiniTest::Test
       ['copy_of_cat', '.host.com', 'path/'],
     ], urls
 
-    assert_match 'found 12 duplicate(s)', stdout
-    assert_match 'found 0 ignored expression(s)', stdout
-
-    assert_empty stderr
+    assert_match 'found 12 duplicate(s)', stderr
+    assert_match 'found 0 ignored expression(s)', stderr
   end
 
   def test_missing_category
@@ -316,7 +311,7 @@ class TestIndexer < MiniTest::Test
 
     assert has_test_data?
 
-    assert_match 'found 3 ignored expression(s)', stdout
+    assert_match 'found 3 ignored expression(s)', stderr
     assert_match 'ERROR: nothing to commit', stderr
   end
 
@@ -343,11 +338,9 @@ class TestIndexer < MiniTest::Test
       ['cat_name', '.google.com', 'adsense/'],
     ], urls
 
-    refute_match 'tracker', stdout
-    assert_match 'indexing ads/', stdout
-    assert_match 'indexed 1 categorie(s): ["cat_name"]', stdout
-
-    assert_empty stderr
+    refute_match 'tracker', stderr
+    assert_match 'indexing ads/', stderr
+    assert_match 'indexed 1 categorie(s): ["cat_name"]', stderr
   end
 
   def test_domains_only
@@ -370,11 +363,9 @@ class TestIndexer < MiniTest::Test
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_empty urls
 
-    assert_match 'found 4 domain(s)', stdout
-    assert_match 'found 0 url(s)', stdout
-    assert_match 'found 3 ignored expression(s)', stdout
-
-    assert_empty stderr
+    assert_match 'found 4 domain(s)', stderr
+    assert_match 'found 0 url(s)', stderr
+    assert_match 'found 3 ignored expression(s)', stderr
   end
 
   def test_urls_only
@@ -396,11 +387,9 @@ class TestIndexer < MiniTest::Test
       ['tracker', '.cloudfront-labs.amazonaws.com', 'x.png/'],
     ], urls
 
-    assert_match 'found 0 domain(s)', stdout
-    assert_match 'found 3 url(s)', stdout
-    assert_match 'found 4 ignored expression(s)', stdout
-
-    assert_empty stderr
+    assert_match 'found 0 domain(s)', stderr
+    assert_match 'found 3 url(s)', stderr
+    assert_match 'found 4 ignored expression(s)', stderr
   end
 
   def test_append
@@ -411,10 +400,10 @@ class TestIndexer < MiniTest::Test
     end
 
     assert has_test_data?, 'should not be truncated'
-    refute_match 'truncating', stdout
 
-    assert_match 'found 4 domain(s)', stdout
-    assert_match 'found 3 url(s)', stdout
+    refute_match 'truncating', stderr
+    assert_match 'found 4 domain(s)', stderr
+    assert_match 'found 3 url(s)', stderr
   end
 
   def test_quiet

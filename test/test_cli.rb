@@ -48,28 +48,30 @@ class TestCLI < MiniTest::Test
       MiddleSquid::CLI.start(%W[index #{list} -C #{conf} --full])
     end
 
-    assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
-    assert_match "reading #{list}", stdout
+    assert_match /\Ahello #<MiddleSquid:.+>\Z/, stdout
+
+    assert_match "reading #{list}", stderr
   end
 
   def test_index_relative_path
     absolute = File.expand_path '../resources', __FILE__
     path = Pathname.new(absolute).relative_path_from(Pathname.new(Dir.home))
 
-    conf = File.join '~', path, 'hello.rb'
+    conf = File.join '~', path, 'empty_config.rb'
     list = File.join '~', path, 'black'
 
     stdout, stderr = capture_io do
       MiddleSquid::CLI.start(%W[index #{list} -C #{conf} --full])
     end
 
-    assert_match /\Ahello #<MiddleSquid:.+>$/, stdout
-    assert_match "reading #{absolute}/black", stdout
+    assert_empty stdout
+
+    assert_match "reading #{absolute}/black", stderr
   end
 
   def test_index_multiple
     path = File.expand_path '../resources', __FILE__
-    config = File.join path, 'hello.rb'
+    config = File.join path, 'empty_config.rb'
     list_1 = File.join path, 'black'
     list_2 = File.join path, 'gray'
 
@@ -77,8 +79,10 @@ class TestCLI < MiniTest::Test
       MiddleSquid::CLI.start(%W[index #{list_1} #{list_2} -C #{config} --full])
     end
 
-    assert_match "reading #{list_1}", stdout
-    assert_match "reading #{list_2}", stdout
+    assert_empty stdout
+
+    assert_match "reading #{list_1}", stderr
+    assert_match "reading #{list_2}", stderr
   end
 
   def test_version

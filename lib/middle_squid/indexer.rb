@@ -54,8 +54,8 @@ module MiddleSquid
     # @param directories [Array<String>]
     def index(directories)
       if !@full_index && @cats_in_use.empty?
-        warn 'ERROR: the loaded configuration does not use any blacklist'
-        puts 'nothing to do in minimal indexing mode'
+        oops 'the loaded configuration does not use any blacklist'
+        info 'nothing to do in minimal indexing mode'
         return
       end
 
@@ -72,28 +72,41 @@ module MiddleSquid
       commit_or_rollback
 
       end_time = Time.now
-      puts "finished after #{end_time - start_time} seconds"
+      info "finished after #{end_time - start_time} seconds"
     ensure
       db.rollback if db.transaction_active?
     end
 
     private
-    def puts(*args)
-      super *args unless @quiet
+    def output(string, always: false)
+      $stderr.print string if always || !@quiet
+    end
+
+    def oops(msg)
+      output "ERROR: #{msg}\n", always: true
+    end
+
+    def warn(msg)
+      output "WARNING: #{msg}\n", always: true
+    end
+
+    def info(line = "")
+      line << "\n"
+      output line
     end
 
     def truncate
-      puts 'truncating database'
+      info 'truncating database'
 
       db.execute 'DELETE FROM domains' 
       db.execute 'DELETE FROM urls' 
     end
 
     def walk_in(directory)
-      puts "reading #{directory}"
+      info "reading #{directory}"
 
       unless File.directory? directory
-        warn "WARNING: #{directory}: no such directory"
+        warn "#{directory}: no such directory"
         return
       end
 
@@ -120,7 +133,7 @@ module MiddleSquid
 
       @indexed_cats << category
 
-      puts "indexing #{dirname}/#{pn.basename}"
+      info "indexing #{dirname}/#{pn.basename}"
 
       File.foreach(path) {|line|
         type = append_to category, line
@@ -167,26 +180,26 @@ module MiddleSquid
       @indexed_cats.uniq!
       missing_cats = @cats_in_use - @indexed_cats
 
-      puts
-      puts "indexed #{@indexed_cats.size} categorie(s): #{@indexed_cats}"
-      warn "WARNING: could not find #{missing_cats}" unless missing_cats.empty?
+      info
+      info "indexed #{@indexed_cats.size} categorie(s): #{@indexed_cats}"
+      warn "could not find #{missing_cats}" unless missing_cats.empty?
     end
 
     def stats
-      puts "found #{@total[:domain]} domain(s)"
-      puts "found #{@total[:url]} url(s)"
-      puts "found #{@total[:duplicate]} duplicate(s)"
-      puts "found #{@total[:ignored]} ignored expression(s)"
-      puts
+      info "found #{@total[:domain]} domain(s)"
+      info "found #{@total[:url]} url(s)"
+      info "found #{@total[:duplicate]} duplicate(s)"
+      info "found #{@total[:ignored]} ignored expression(s)"
+      info
     end
 
     def commit_or_rollback
       if @total[:domain] > 0 || @total[:url] > 0
-        puts 'committing changes'
+        info 'committing changes'
         db.commit
       else
-        warn 'ERROR: nothing to commit'
-        puts 'reverting changes'
+        oops 'nothing to commit'
+        info 'reverting changes'
         db.rollback
       end
     end
