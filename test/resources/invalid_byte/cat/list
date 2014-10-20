@@ -1,1 +1,2 @@
 host.com/path_with_£_invalid_byte
+host.com/invalidêbyte

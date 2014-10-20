@@ -248,6 +248,7 @@ class TestIndexer < MiniTest::Test
     urls = db.execute 'SELECT category, host, path FROM urls'
     assert_equal [
       ['cat', '.host.com', 'path_with__invalid_byte/'],
+      ['cat', '.host.com', 'invalidbyte/'],
     ], urls
   end
 

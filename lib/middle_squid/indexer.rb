@@ -129,14 +129,14 @@ module MiddleSquid
     end
 
     def append_to(category, line)
+      # fix invalid UTF-8 byte sequences
+      line.scrub! ''
+
       # remove trailing whitespace
       line.strip!
 
       # ignore regex lists
       return :ignored unless line[0] =~ /\w/
-
-      # fix invalid bytes
-      line.scrub! ''
 
       # fix for dirty lists
       line.tr! '\\', '/'
