@@ -444,4 +444,19 @@ nothing to do in minimal indexing mode
       ['cat', '.after.com', 'path/'],
     ], urls
   end
+
+  def test_progress
+    stdout, stderr = capture_io do
+      @obj.index [File.join(@path, 'black')]
+    end
+
+    lines = stderr.lines.select {|l| l =~ /indexing/ }
+
+    assert_equal [
+      "\rindexing ads/domains [0%]\rindexing ads/domains [48%]\rindexing ads/domains [100%]\n",
+      "\rindexing ads/urls [0%]\rindexing ads/urls [100%]\n",
+      "\rindexing tracker/domains [0%]\rindexing tracker/domains [30%]\rindexing tracker/domains [100%]\n",
+      "\rindexing tracker/urls [0%]\rindexing tracker/urls [40%]\rindexing tracker/urls [100%]\n",
+    ], lines
+  end
 end

@@ -133,12 +133,26 @@ module MiddleSquid
 
       @indexed_cats << category
 
-      info "indexing #{dirname}/#{pn.basename}"
+      total_size = File.size path
+      current_pos = percent = reported = 0
+
+      status = "\rindexing #{dirname}/#{pn.basename} [%d%%]"
+      output status % percent
 
       File.foreach(path) {|line|
+        current_pos += line.bytesize
+        percent = (current_pos.to_f / total_size * 100).to_i
+
+        if percent != reported
+          output status % percent
+          reported = percent
+        end
+
         type = append_to category, line
         @total[type] += 1
       }
+
+      output "\n"
     end
 
     def append_to(category, line)
