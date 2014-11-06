@@ -29,7 +29,7 @@ module MiddleSquid::Helpers
   #     }
   #   }
   # @param request [Rack::Request] the request to imitate
-  # @param uri [URI] the resource to fetch
+  # @param uri [#to_s] the resource to fetch
   # @return [Array] a rack triplet (status code, response headers and body)
   # @see Actions#intercept
   def download_like(request, uri)

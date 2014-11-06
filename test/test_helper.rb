@@ -73,4 +73,17 @@ class TestHelpers < MiniTest::Test
     assert_equal({'Content-Type' => 'text/plain'}, headers)
     assert_equal '[MiddleSquid] WebMock timeout error', body
   end
+
+  def test_download_from_string
+    uri = 'http://test.com/' # not a URI object
+
+    stub = stub_request(:get, uri).
+      to_return(:status => 200, :body => '')
+
+    download_wrapper uri,
+      'REQUEST_METHOD' => 'GET',
+      'rack.input' => StringIO.new
+
+    assert_requested stub
+  end
 end
