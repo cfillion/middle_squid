@@ -208,6 +208,13 @@ MiddleSquid's documentation is hosted at
 
 ## Changelog
 
+### v1.0.1 (2014-11-06)
+
+- send download errors as text/plain
+- fix a crash when reading invalid UTF-8 byte sequences
+- cleanup `index`'s output (everything is now sent to stderr)
+- show the indexing progress
+
 ### v1.0 (2014-10-05)
 
 First public release.
