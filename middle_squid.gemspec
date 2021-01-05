@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'middle_squid'
   spec.version       = MiddleSquid::VERSION
   spec.authors       = ['Christian Fillion']
-  spec.email         = ['middle_squid@cfillion.tk']
+  spec.email         = ['middle_squid@cfillion.ca']
   spec.summary       = 'A redirector, url mangler and webpage interceptor for the Squid HTTP proxy'
   spec.homepage      = 'https://github.com/cfillion/middle_squid'
   spec.license       = 'GPL-3.0+'
@@ -18,11 +18,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 1.7'
+  spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'coveralls', '~> 0.7'
   spec.add_development_dependency 'minitest', '~> 5.4'
   spec.add_development_dependency 'rack-test', '~> 0.6'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rake', '>= 12.3.3'
   spec.add_development_dependency 'simplecov', '~> 0.9'
   spec.add_development_dependency 'thin-async-test', '~> 1.0'
   spec.add_development_dependency 'webmock', '~> 1.18'
