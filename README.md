@@ -2,7 +2,6 @@
 
 [![Gem Version](https://badge.fury.io/rb/middle_squid.svg)](http://badge.fury.io/rb/middle_squid)
 [![Test status](https://github.com/cfillion/middle_squid/workflows/test/badge.svg)](https://github.com/cfillion/middle_squid/actions)
-[![Dependency Status](https://gemnasium.com/cfillion/middle_squid.svg)](https://gemnasium.com/cfillion/middle_squid)
 [![Code Climate](https://codeclimate.com/github/cfillion/middle_squid/badges/gpa.svg)](https://codeclimate.com/github/cfillion/middle_squid)
 [![Coverage Status](https://img.shields.io/coveralls/cfillion/middle_squid.svg)](https://coveralls.io/r/cfillion/middle_squid?branch=master)
 
