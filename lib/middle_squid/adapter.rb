@@ -38,7 +38,7 @@ module MiddleSquid
     #
     # redirect::
     #   Options:
-    #   - +status+ [+Fixnum+]
+    #   - +status+ [+Integer+]
     #   - +url+ [+String+]
     #
     # replace::

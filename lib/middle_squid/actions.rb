@@ -20,7 +20,7 @@ module MiddleSquid::Actions
   #     redirect_to "http://duckduckgo.com/#{uri.request_uri}" if uri.host == 'google.com'
   #   }
   # @param url [String] the new url
-  # @param status [Fixnum] HTTP status code (see http://tools.ietf.org/html/rfc7231#section-6.4)
+  # @param status [Integer] HTTP status code (see http://tools.ietf.org/html/rfc7231#section-6.4)
   def redirect_to(url, status: 301)
     action :redirect, status: status, url: url
   end

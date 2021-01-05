@@ -31,7 +31,7 @@ class TestServer < MiniTest::Test
       @server.start
 
       assert_equal '127.0.0.1', @server.host
-      assert_instance_of Fixnum, @server.port
+      assert_instance_of Integer, @server.port
       assert @server.port > 0
 
       @server.stop

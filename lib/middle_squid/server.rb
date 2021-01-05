@@ -12,7 +12,7 @@ module MiddleSquid
     # @return [String]
     attr_reader :host
 
-    # @return [Fixnum]
+    # @return [Integer]
     attr_reader :port
 
     def initialize
