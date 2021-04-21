@@ -111,8 +111,8 @@ module MiddleSquid
     #   }
     # @return [BlackList]
     # @see BlackList#initialize BlackList#initialize
-    def blacklist(*args)
-      bl = BlackList.new *args
+    def blacklist(*args, **kwargs)
+      bl = BlackList.new *args, **kwargs
       @blacklists << bl
       bl
     end

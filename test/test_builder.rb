@@ -40,9 +40,10 @@ class TestBuilder < MiniTest::Test
   def test_blacklist
     assert_empty @obj.blacklists
 
-    bl = @obj.blacklist 'hello'
+    bl = @obj.blacklist 'hello', aliases: ['world']
     assert_instance_of MiddleSquid::BlackList, bl
     assert_equal 'hello', bl.category
+    assert_equal ['world'], bl.aliases
 
     assert_equal [bl], @obj.blacklists
   end
